@@ -241,7 +241,24 @@ function cfgI(k,fb){return parseInt(cfg(k,String(fb!==undefined?fb:0)),10);}
 function cfgArr(k,fb){var v=cfg(k,Array.isArray(fb)?fb.join(","):(fb||""));return v?v.split(",").map(function(s){return s.trim();}).filter(Boolean):[];}
 var SBH={"apikey":window.SUPABASE_ANON_KEY,"Authorization":"Bearer "+window.SUPABASE_ANON_KEY};
 function sbFetch(p){return fetch(window.SUPABASE_URL+"/rest/v1/"+p,{headers:SBH}).then(function(r){return r.json();});}
-function getOpts(db,f){return fetch(window.SUPABASE_URL+"/rest/v1/ref_categories?select=value,label&order=sort_order.asc,label.asc&dashboard=eq."+encodeURIComponent(db)+"&field=eq."+encodeURIComponent(f),{headers:SBH}).then(function(r){return r.json();}).catch(function(){return [];});}
+var DEFAULT_OPTS={
+  fiscal_year:[{value:"FY 2024/25",label:"FY 2024/25"},{value:"FY 2025/26",label:"FY 2025/26"}],
+  vehicle_class:[{value:"Class 1",label:"Class 1 - Motorcycles"},{value:"Class 2",label:"Class 2 - Saloon Cars"},{value:"Class 3",label:"Class 3 - Light Goods"},{value:"Class 4",label:"Class 4 - Medium Trucks"},{value:"Class 5",label:"Class 5 - Heavy Trucks"}],
+  highway:[{value:"KEE Mainline",label:"KEE Mainline"},{value:"Munyonyo Spur",label:"Munyonyo Spur"}],
+  incident_type:[{value:"Breakdown",label:"Breakdown"},{value:"Accident",label:"Accident"},{value:"Obstruction",label:"Obstruction"},{value:"Weather Event",label:"Weather Event"}],
+  vms_category:[{value:"Warning",label:"Warning"},{value:"Speed Limit",label:"Speed Limit"},{value:"Toll Tariff",label:"Toll Tariff"},{value:"Public Notice",label:"Public Notice"}],
+  violation_type:[{value:"Overload",label:"Overload"},{value:"Speeding",label:"Speeding"},{value:"Toll Evasion",label:"Toll Evasion"}],
+  enforcement_station:[{value:"Busega Weighbridge",label:"Busega Weighbridge"},{value:"Kajjansi Weighbridge",label:"Kajjansi Weighbridge"},{value:"Mpala Weighbridge",label:"Mpala Weighbridge"}],
+  toll_plaza:[{value:"Busega Plaza",label:"Busega Plaza"},{value:"Kajjansi Plaza",label:"Kajjansi Plaza"},{value:"Mpala Plaza",label:"Mpala Plaza"}],
+  direction:[{value:"Kampala - Entebbe",label:"Kampala - Entebbe"},{value:"Entebbe - Kampala",label:"Entebbe - Kampala"}],
+  station:[{value:"Busega",label:"Busega"},{value:"Kajjansi",label:"Kajjansi"},{value:"Mpala",label:"Mpala"}]
+};
+function getOpts(db,f){
+  return fetch(window.SUPABASE_URL+"/rest/v1/ref_categories?select=value,label&order=sort_order.asc,label.asc&dashboard=eq."+encodeURIComponent(db)+"&field=eq."+encodeURIComponent(f),{headers:SBH})
+    .then(function(r){return r.ok?r.json():[];})
+    .then(function(rows){return (Array.isArray(rows)&&rows.length>0)?rows:(DEFAULT_OPTS[f]||[]);})
+    .catch(function(){return DEFAULT_OPTS[f]||[];});
+}
 function loadConfig(){return fetch(window.SUPABASE_URL+"/rest/v1/config?select=*",{headers:SBH}).then(function(r){return r.json();}).then(function(rows){if(Array.isArray(rows))rows.forEach(function(row){if(row&&row.key)window.MOWT_CONFIG[row.key]=row.value;});}).catch(function(e){console.warn("[KEE]",e.message);});}
 
 var CH={};
