@@ -6,42 +6,42 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#000;color:#fff;font-family:'Segoe UI',sans-serif;font-size:13px;}
-:root{--c:#00f5ff;--g:#00ff88;--p:#ff006e;--o:#ff6600;--y:#ffee00;}
-header{display:flex;align-items:center;gap:14px;padding:10px 18px;background:#050505;border-bottom:2px solid var(--c);}
+body{background:#f4f6f8;color:#111827;font-family:Arial,sans-serif;font-size:13px;}
+:root{--c:#2563eb;--g:#278a50;--p:#b83d6b;--o:#c75a24;--y:#b77900;}
+header{display:flex;align-items:center;gap:14px;padding:10px 18px;background:#fff;border-bottom:1px solid #cbd5e1;}
 header img{height:40px;}
 .brand-mark{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:#111827;color:#fff;font-weight:800;font-size:12px;letter-spacing:.04em;}
 header h1{font-size:17px;color:var(--c);letter-spacing:1px;}
-header p{font-size:11px;color:#888;margin-top:2px;}
-nav{display:flex;background:#080808;border-bottom:1px solid #1a1a1a;overflow-x:auto;}
-nav button{flex:none;padding:11px 20px;background:none;border:none;color:#666;cursor:pointer;font-size:12px;letter-spacing:.5px;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s;}
-nav button.active{color:var(--c);border-bottom-color:var(--c);background:#0a0a0a;}
-nav button:hover:not(.active){color:#aaa;}
+header p{font-size:11px;color:#4b5563;margin-top:2px;}
+nav{display:flex;background:#fff;border-bottom:1px solid #cbd5e1;overflow-x:auto;}
+nav button{flex:none;padding:11px 20px;background:#fff;border:none;color:#4b5563;cursor:pointer;font-size:12px;letter-spacing:.5px;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s;}
+nav button.active{color:#fff;border-bottom-color:var(--c);background:var(--c);}
+nav button:hover:not(.active){color:#111827;background:#eef4ff;}
 .tab{display:none;padding:16px;}
 .tab.active{display:block;}
-#gf-bar{display:flex;flex-wrap:wrap;gap:10px;padding:10px 18px;background:#0a0a0a;border-bottom:1px solid #1a1a1a;align-items:center;}
-#gf-bar label{font-size:11px;color:#888;display:flex;flex-direction:column;gap:2px;}
-#gf-bar select{background:#111;border:1px solid var(--c);color:#fff;padding:5px 10px;border-radius:4px;font-size:12px;min-width:130px;}
-#gf-bar button{background:transparent;border:1px solid var(--c);color:var(--c);padding:5px 12px;border-radius:4px;cursor:pointer;font-size:11px;margin-top:14px;}
+#gf-bar{display:flex;flex-wrap:wrap;gap:10px;padding:10px 18px;background:#f8fafc;border-bottom:1px solid #cbd5e1;align-items:center;}
+#gf-bar label{font-size:11px;color:#374151;display:flex;flex-direction:column;gap:2px;}
+#gf-bar select{background:#fff;border:1px solid #94a3b8;color:#111827;padding:5px 10px;border-radius:8px;font-size:12px;min-width:130px;}
+#gf-bar button{background:#fff;border:1px solid var(--c);color:var(--c);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:11px;margin-top:14px;}
 .kpis{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px;}
-.kpi{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;padding:14px 18px;min-width:160px;flex:1;}
+.kpi{background:#fff;border:1px solid #d5dbe3;border-radius:12px;padding:14px 18px;min-width:160px;flex:1;}
 .kpi .val{font-size:26px;font-weight:700;color:var(--c);}
-.kpi .lbl{font-size:11px;color:#888;margin-top:4px;}
+.kpi .lbl{font-size:11px;color:#4b5563;margin-top:4px;}
 .kpi .delta{font-size:11px;margin-top:3px;}
 .delta.up{color:var(--g);} .delta.dn{color:var(--p);}
 .row{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
 .col{flex:1;min-width:280px;}
-.card{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;padding:14px;}
-.card h3{font-size:12px;color:#888;letter-spacing:.5px;margin-bottom:10px;text-transform:uppercase;}
+.card{background:#fff;border:1px solid #d5dbe3;border-radius:12px;padding:14px;}
+.card h3{font-size:12px;color:#374151;letter-spacing:.5px;margin-bottom:10px;text-transform:uppercase;}
 .chart-wrap{position:relative;height:260px;}
 .dl-bar{display:flex;gap:8px;margin-bottom:10px;}
-.dl-bar button{background:#111;border:1px solid var(--c);color:var(--c);padding:5px 12px;border-radius:4px;cursor:pointer;font-size:11px;}
-.dl-bar button:hover{background:var(--c);color:#000;}
+.dl-bar button{background:#fff;border:1px solid var(--c);color:var(--c);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:11px;}
+.dl-bar button:hover{background:var(--c);color:#fff;}
 .tbl-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
-th{background:#111;color:var(--c);padding:8px 10px;text-align:left;border-bottom:1px solid #222;white-space:nowrap;}
-td{padding:7px 10px;border-bottom:1px solid #111;color:#ccc;}
-tr:hover td{background:#0d0d0d;}
+th{background:#eef2f7;color:#111827;padding:8px 10px;text-align:left;border-bottom:1px solid #cbd5e1;white-space:nowrap;}
+td{padding:7px 10px;border-bottom:1px solid #e5e7eb;color:#111827;}
+tr:hover td{background:#eef4ff;}
 .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
 .badge-good{background:rgba(0,255,136,.12);color:var(--g);border:1px solid var(--g);}
 .badge-warn{background:rgba(255,238,0,.12);color:var(--y);border:1px solid var(--y);}
@@ -55,12 +55,12 @@ tr:hover td{background:#0d0d0d;}
 .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
 .s-on{background:var(--g);} .s-off{background:var(--p);} .s-warn{background:var(--y);}
 .vms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:8px;}
-.vms-card{background:#0d0d0d;border:1px solid #222;border-radius:6px;padding:12px;}
+.vms-card{background:#fff;border:1px solid #d5dbe3;border-radius:10px;padding:12px;}
 .vms-card .vms-id{font-size:11px;color:var(--c);font-weight:700;}
-.vms-card .vms-loc{font-size:10px;color:#666;margin:3px 0;}
-.vms-card .vms-msg{font-size:12px;color:#fff;background:#111;padding:6px;border-radius:4px;margin:6px 0;min-height:36px;text-align:center;}
+.vms-card .vms-loc{font-size:10px;color:#4b5563;margin:3px 0;}
+.vms-card .vms-msg{font-size:12px;color:#111827;background:#f1f5f9;padding:6px;border-radius:6px;margin:6px 0;min-height:36px;text-align:center;}
 .vms-card .vms-status{font-size:11px;}
-.toll-lane{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#111;border-radius:4px;margin-bottom:6px;}
+.toll-lane{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:6px;}
 
 /* ── Mobile responsiveness (additive, does not alter desktop rules above) ── */
 @media (max-width:768px){
@@ -106,12 +106,12 @@ tr:hover td{background:#0d0d0d;}
   th,td{padding:7px 6px;font-size:10px;}
 }
 </style>
-  <link rel="stylesheet" href="./apple-system.css?v=20261116-1">
+  <link rel="stylesheet" href="./apple-system.css?v=20261116-2">
 </head>
 <body>
 <header>
 <span class="brand-mark" aria-hidden="true">DST</span>
-<div><h1>KEE ITS DASHBOARD</h1><p>Ministry of Works and Transport — Intelligent Transport Systems</p></div>
+<div><h1>KEE ITS DASHBOARD</h1><p>Data Science Trials | Modelled historical ITS learning workspace</p></div>
 </header>
 
 <div id="gf-bar">
@@ -268,9 +268,9 @@ var CH={};
 function mkChart(id,type,labels,datasets,opts){
   var el=document.getElementById(id);if(!el)return;
   if(CH[id])CH[id].destroy();
-  CH[id]=new Chart(el.getContext("2d"),{type:type,data:{labels:labels,datasets:datasets},options:Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:"#aaa",font:{size:11}}}},scales:{x:{ticks:{color:"#888"},grid:{color:"#1a1a1a"}},y:{ticks:{color:"#888"},grid:{color:"#1a1a1a"}}}},opts||{})});
+  CH[id]=new Chart(el.getContext("2d"),{type:type,data:{labels:labels,datasets:datasets},options:Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:"#374151",font:{size:11,family:"Arial"}}}},scales:{x:{ticks:{color:"#4b5563"},grid:{color:"#e5e7eb"}},y:{ticks:{color:"#4b5563"},grid:{color:"#e5e7eb"}}}},opts||{})});
 }
-function mkDoughnut(id,labels,data,colors){mkChart(id,"doughnut",labels,[{data:data,backgroundColor:colors,borderWidth:0}],{plugins:{legend:{position:"right",labels:{color:"#aaa",font:{size:10}}}}});}
+function mkDoughnut(id,labels,data,colors){mkChart(id,"doughnut",labels,[{data:data,backgroundColor:colors,borderWidth:0}],{plugins:{legend:{position:"right",labels:{color:"#4b5563",font:{size:10}}}}});}
 function mkHBar(id,labels,datasets,opts){mkChart(id,"bar",labels,datasets,Object.assign({indexAxis:"y"},opts||{}));}
 function dlPNG(id){var c=CH[id];if(!c)return;var a=document.createElement("a");a.href=c.toBase64Image();a.download=id+".png";a.click();}
 function dlCSV(id){
@@ -295,7 +295,7 @@ function rnd(lo,hi){return Math.round((lo+Math.random()*(hi-lo))*10)/10;}
 function rndArr(n,lo,hi){var a=[];for(var i=0;i<n;i++)a.push(rnd(lo,hi));return a;}
 function rndTrend(n,start,g){var a=[start];for(var i=1;i<n;i++)a.push(Math.round(a[i-1]*(1+g*(0.8+Math.random()*.4))*10)/10);return a;}
 
-var COL=["#00f5ff","#00ff88","#ffee00","#ff6600","#ff006e","#9966ff","#33ccff"];
+var COL=["#2563eb","#278a50","#b77900","#c75a24","#b83d6b","#7258b7","#3f76c5"];
 
 // ── ITS Overview ──────────────────────────────────────────────────────────────
 function loadITS(){
@@ -310,14 +310,14 @@ function loadITS(){
     document.getElementById("kv-toll").textContent="UGX "+(cfgF("kee.toll_today",82.4)/1000).toFixed(1)+"M";document.getElementById("kd-toll").textContent="▲ vs yesterday";
     document.getElementById("kv-speed").textContent=cfgI("kee.avg_speed",78)+" km/h";
     // Volume stacked by vehicle class
-    mkChart("ch-vol-stk","bar",fys,vclasses.slice(0,5).map(function(v,i){return {label:v,data:rndTrend(fys.length,rnd(2000,8000),cfgF("kee.vol_growth",0.04)),backgroundColor:COL[i],stack:"s"};}),{plugins:{legend:{labels:{color:"#aaa"}}}});
+    mkChart("ch-vol-stk","bar",fys,vclasses.slice(0,5).map(function(v,i){return {label:v,data:rndTrend(fys.length,rnd(2000,8000),cfgF("kee.vol_growth",0.04)),backgroundColor:COL[i],stack:"s"};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
     // Volume clustered by direction
     var dirs=cfgArr("kee.directions","Northbound,Southbound".split(","));
-    mkChart("ch-vol-clu","bar",fys,dirs.map(function(d,i){return {label:d,data:rndTrend(fys.length,rnd(8000,15000),cfgF("kee.vol_growth",0.04)),backgroundColor:COL[i]};}),{plugins:{legend:{labels:{color:"#aaa"}}}});
+    mkChart("ch-vol-clu","bar",fys,dirs.map(function(d,i){return {label:d,data:rndTrend(fys.length,rnd(8000,15000),cfgF("kee.vol_growth",0.04)),backgroundColor:COL[i]};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
     // Hourly distribution
     var hrs=[];for(var h=0;h<24;h++)hrs.push(h+":00");
     mkChart("ch-hourly","line",hrs,[{label:"Traffic Volume",data:hrs.map(function(h,i){var peak=(i>=7&&i<=9)||(i>=17&&i<=19);return Math.round((peak?rnd(1500,2500):rnd(200,800))*10)/10;
-    }),borderColor:"#00f5ff",fill:true,backgroundColor:"rgba(0,245,255,.07)",tension:.4}],{plugins:{legend:{display:false}}});
+    }),borderColor:"#2563eb",fill:true,backgroundColor:"rgba(0,245,255,.07)",tension:.4}],{plugins:{legend:{display:false}}});
     // Vehicle class mix
     mkDoughnut("ch-class",vclasses,rndArr(vclasses.length,5,35),COL);
   });
@@ -330,14 +330,14 @@ function loadIncidents(){
     var iTypes=types.length?types.map(function(t){return t.label||t.value;}):cfgArr("kee.incident_types","Accident,Breakdown,Obstruction,Flooding,Rockfall,Animal on Road".split(","));
     var months=[];for(var i=11;i>=0;i--){var d=new Date();d.setMonth(d.getMonth()-i);months.push(d.toLocaleString("default",{month:"short",year:"2-digit"}));}
     document.getElementById("kpis-inc").innerHTML="<div class='kpi'><div class='val' style='color:var(--p)'>"+cfgI("kee.incidents_mtd",47)+"</div><div class='lbl'>Incidents MTD</div></div><div class='kpi'><div class='val' style='color:var(--y)'>"+cfgF("kee.avg_clearance",18.4).toFixed(1)+" min</div><div class='lbl'>Avg Clearance Time</div></div><div class='kpi'><div class='val' style='color:var(--g)'>"+cfgF("kee.resp_rate",94.2).toFixed(1)+"%</div><div class='lbl'>Response Rate</div></div>";
-    mkChart("ch-inc-stk","bar",months,iTypes.slice(0,4).map(function(t,i){return {label:t,data:rndArr(12,2,20),backgroundColor:COL[i],stack:"s"};}),{plugins:{legend:{labels:{color:"#aaa"}}}});
+    mkChart("ch-inc-stk","bar",months,iTypes.slice(0,4).map(function(t,i){return {label:t,data:rndArr(12,2,20),backgroundColor:COL[i],stack:"s"};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
     mkChart("ch-inc-sev","bar",months,[
-      {label:"Minor",data:rndArr(12,5,20),backgroundColor:"#00ff88"},{label:"Moderate",data:rndArr(12,2,12),backgroundColor:"#ffee00"},{label:"Severe",data:rndArr(12,0,6),backgroundColor:"#ff006e"}
-    ],{plugins:{legend:{labels:{color:"#aaa"}}}});
+      {label:"Minor",data:rndArr(12,5,20),backgroundColor:"#278a50"},{label:"Moderate",data:rndArr(12,2,12),backgroundColor:"#b77900"},{label:"Severe",data:rndArr(12,0,6),backgroundColor:"#b83d6b"}
+    ],{plugins:{legend:{labels:{color:"#4b5563"}}}});
     var respBins=cfgArr("kee.resp_bins","<5,5-10,10-20,20-30,>30".split(","));
-    mkChart("ch-resp","bar",respBins,[{label:"Incidents",data:rndArr(5,5,80),backgroundColor:["#00ff88","#00f5ff","#ffee00","#ff6600","#ff006e"]}],{plugins:{legend:{display:false}}});
+    mkChart("ch-resp","bar",respBins,[{label:"Incidents",data:rndArr(5,5,80),backgroundColor:["#278a50","#2563eb","#b77900","#c75a24","#b83d6b"]}],{plugins:{legend:{display:false}}});
     var locs=cfgArr("kee.hotspots","Km 12,Km 28,Km 45,Km 67,Km 89,Km 103,Km 128".split(","));
-    mkHBar("ch-hotspot",locs,[{label:"Incidents",data:rndArr(locs.length,5,60),backgroundColor:"#ff006e"}]);
+    mkHBar("ch-hotspot",locs,[{label:"Incidents",data:rndArr(locs.length,5,60),backgroundColor:"#b83d6b"}]);
     // Incident log
     INC_ALL=[];
     var types2=["Accident","Breakdown","Obstruction","Flooding","Animal on Road","Rockfall"];
@@ -372,7 +372,7 @@ function loadVMS(){
   }).catch(function(){VMS_DATA=genVMS();renderVMS();});
   document.getElementById("kpis-vms").innerHTML="<div class='kpi'><div class='val' style='color:var(--g)'>"+cfgI("kee.vms_online",18)+"</div><div class='lbl'>Online</div></div><div class='kpi'><div class='val' style='color:var(--p)'>"+cfgI("kee.vms_offline",2)+"</div><div class='lbl'>Offline</div></div><div class='kpi'><div class='val' style='color:var(--y)'>"+cfgI("kee.vms_warn",0)+"</div><div class='lbl'>Warning</div></div>";
   var months=[];for(var i=5;i>=0;i--){var d=new Date();d.setMonth(d.getMonth()-i);months.push(d.toLocaleString("default",{month:"short"}));}
-  mkChart("ch-vms-up","line",months,[{label:"Uptime %",data:rndArr(6,92,99.8),borderColor:"#00ff88",tension:.4,fill:false}],{scales:{y:{min:80,max:100}},plugins:{legend:{display:false}}});
+  mkChart("ch-vms-up","line",months,[{label:"Uptime %",data:rndArr(6,92,99.8),borderColor:"#278a50",tension:.4,fill:false}],{scales:{y:{min:80,max:100}},plugins:{legend:{display:false}}});
   getOpts("kee","vms_category").then(function(cats){
     var catLbls=cats.length?cats.map(function(c){return c.label||c.value;}):["Traffic Advisory","Weather Warning","Speed Limit","Incident Alert","Lane Closure","General Info"];
     mkDoughnut("ch-vms-cat",catLbls,rndArr(catLbls.length,10,80),COL);
@@ -406,9 +406,9 @@ function loadEnforce(){
     var stns=res[1].length?res[1].map(function(s){return s.label||s.value;}):cfgArr("kee.enf_stations","Namanve,Lugazi,Jinja,Iganga,Budaka".split(","));
     document.getElementById("kpis-enf").innerHTML="<div class='kpi'><div class='val'>"+cfgI("kee.violations_mtd",1842).toLocaleString()+"</div><div class='lbl'>Violations MTD</div></div><div class='kpi'><div class='val' style='color:var(--g)'>UGX "+cfgF("kee.fines_mtd",184.2).toFixed(1)+"M</div><div class='lbl'>Fines Collected MTD</div></div><div class='kpi'><div class='val' style='color:var(--y)'>"+cfgF("kee.collection_rate",78.4).toFixed(1)+"%</div><div class='lbl'>Collection Rate</div></div>";
     var months=[];for(var i=11;i>=0;i--){var d=new Date();d.setMonth(d.getMonth()-i);months.push(d.toLocaleString("default",{month:"short",year:"2-digit"}));}
-    mkChart("ch-viol-stk","bar",months,vtypes.slice(0,4).map(function(v,i){return {label:v,data:rndArr(12,20,200),backgroundColor:COL[i],stack:"s"};}),{plugins:{legend:{labels:{color:"#aaa"}}}});
-    mkChart("ch-viol-stn","bar",months,stns.slice(0,3).map(function(s,i){return {label:s,data:rndArr(12,50,300),backgroundColor:COL[i]};}),{plugins:{legend:{labels:{color:"#aaa"}}}});
-    mkChart("ch-fines","line",months,[{label:"UGX (Millions)",data:rndTrend(12,cfgF("kee.fines_start",120),cfgF("kee.fines_growth",0.03)),borderColor:"#00ff88",fill:true,backgroundColor:"rgba(0,255,136,.07)",tension:.4}],{plugins:{legend:{display:false}}});
+    mkChart("ch-viol-stk","bar",months,vtypes.slice(0,4).map(function(v,i){return {label:v,data:rndArr(12,20,200),backgroundColor:COL[i],stack:"s"};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
+    mkChart("ch-viol-stn","bar",months,stns.slice(0,3).map(function(s,i){return {label:s,data:rndArr(12,50,300),backgroundColor:COL[i]};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
+    mkChart("ch-fines","line",months,[{label:"UGX (Millions)",data:rndTrend(12,cfgF("kee.fines_start",120),cfgF("kee.fines_growth",0.03)),borderColor:"#278a50",fill:true,backgroundColor:"rgba(0,255,136,.07)",tension:.4}],{plugins:{legend:{display:false}}});
     mkDoughnut("ch-viol-type",vtypes,rndArr(vtypes.length,50,400),COL);
     var tbody=document.getElementById("enf-tbody");
     var rows=[];
@@ -424,13 +424,13 @@ function loadToll(){
     var plazas=res[1].length?res[1].map(function(p){return p.label||p.value;}):cfgArr("kee.toll_plazas","Namanve,Lugazi,Jinja,Iganga".split(","));
     var vcls=res[2].length?res[2].map(function(v){return v.label||v.value;}):["Class 1","Class 2","Class 3","Class 4"];
     document.getElementById("kpis-toll").innerHTML="<div class='kpi'><div class='val' style='color:var(--g)'>UGX "+cfgF("kee.toll_ytd",8.4).toFixed(1)+"Bn</div><div class='lbl'>Revenue YTD</div></div><div class='kpi'><div class='val'>"+cfgI("kee.txn_today",28400).toLocaleString()+"</div><div class='lbl'>Transactions Today</div></div><div class='kpi'><div class='val' style='color:var(--c)'>"+cfgI("kee.etoll_pct",34)+"%</div><div class='lbl'>e-Toll Share</div></div>";
-    mkChart("ch-toll-stk","bar",fys,plazas.map(function(p,i){return {label:p,data:rndTrend(fys.length,rnd(0.5,2),cfgF("kee.toll_growth",0.08)),backgroundColor:COL[i],stack:"s"};}),{plugins:{legend:{labels:{color:"#aaa"}}}});
-    mkChart("ch-toll-clu","bar",fys,vcls.map(function(v,i){return {label:v,data:rndTrend(fys.length,rnd(0.2,1.5),cfgF("kee.toll_growth",0.08)),backgroundColor:COL[i]};}),{plugins:{legend:{labels:{color:"#aaa"}}}});
+    mkChart("ch-toll-stk","bar",fys,plazas.map(function(p,i){return {label:p,data:rndTrend(fys.length,rnd(0.5,2),cfgF("kee.toll_growth",0.08)),backgroundColor:COL[i],stack:"s"};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
+    mkChart("ch-toll-clu","bar",fys,vcls.map(function(v,i){return {label:v,data:rndTrend(fys.length,rnd(0.2,1.5),cfgF("kee.toll_growth",0.08)),backgroundColor:COL[i]};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
     var days=[];for(var i=29;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);days.push(d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"}));}
-    mkChart("ch-toll-daily","line",days,[{label:"Revenue (UGX M)",data:rndArr(30,60,120),borderColor:"#ffee00",fill:true,backgroundColor:"rgba(255,238,0,.05)",tension:.4}],{plugins:{legend:{display:false}}});
+    mkChart("ch-toll-daily","line",days,[{label:"Revenue (UGX M)",data:rndArr(30,60,120),borderColor:"#b77900",fill:true,backgroundColor:"rgba(255,238,0,.05)",tension:.4}],{plugins:{legend:{display:false}}});
     var hrs=[];for(var h=0;h<24;h++)hrs.push(h+":00");
     mkChart("ch-toll-hr","bar",hrs,[{label:"Transactions",data:hrs.map(function(_,i){return Math.round(rnd(i>=6&&i<=8||i>=17&&i<=19?800:100,i>=6&&i<=8||i>=17&&i<=19?2000:500));
-    }),backgroundColor:"#00f5ff"}],{plugins:{legend:{display:false}}});
+    }),backgroundColor:"#2563eb"}],{plugins:{legend:{display:false}}});
     // Lane status
     var lanesEl=document.getElementById("toll-lanes");
     lanesEl.innerHTML=plazas.map(function(p){
@@ -448,11 +448,11 @@ function loadAdm(){
   document.getElementById("kpis-adm").innerHTML="<div class='kpi'><div class='val'>"+cfgI("kee.devices_total",105)+"</div><div class='lbl'>ITS Devices</div></div><div class='kpi'><div class='val' style='color:var(--g)'>"+cfgF("kee.sys_uptime",99.2).toFixed(1)+"%</div><div class='lbl'>System Uptime</div></div><div class='kpi'><div class='val' style='color:var(--c)'>"+cfgI("kee.operators",8)+"</div><div class='lbl'>Active Operators</div></div>";
   var months=[];for(var i=5;i>=0;i--){var d=new Date();d.setMonth(d.getMonth()-i);months.push(d.toLocaleString("default",{month:"short"}));}
   var devices=cfgArr("kee.device_types","VMS,CCTV,ATC,Toll,ANPR".split(","));
-  mkChart("ch-adm-up","line",months,devices.map(function(d,i){return {label:d,data:rndArr(6,94,99.9),borderColor:COL[i],tension:.4,fill:false};}),{plugins:{legend:{labels:{color:"#aaa"}}}});
+  mkChart("ch-adm-up","line",months,devices.map(function(d,i){return {label:d,data:rndArr(6,94,99.9),borderColor:COL[i],tension:.4,fill:false};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
   var srcs=cfgArr("kee.data_sources","CCTV,ATC,VMS,Toll,ANPR,Weather".split(","));
   mkChart("ch-sync","bar",srcs,[{label:"Sync %",data:rndArr(srcs.length,88,100),backgroundColor:srcs.map(function(_,i){return COL[i%COL.length];})}],{plugins:{legend:{display:false}},indexAxis:"y",scales:{x:{min:0,max:100}}});
   var weeks=["W-5","W-4","W-3","W-2","W-1","This Week"];
-  mkChart("ch-alerts","bar",weeks,[{label:"Critical",data:rndArr(6,1,8),backgroundColor:"#ff006e"},{label:"Warning",data:rndArr(6,5,20),backgroundColor:"#ffee00"},{label:"Info",data:rndArr(6,10,40),backgroundColor:"#00f5ff"}],{plugins:{legend:{labels:{color:"#aaa"}}}});
+  mkChart("ch-alerts","bar",weeks,[{label:"Critical",data:rndArr(6,1,8),backgroundColor:"#b83d6b"},{label:"Warning",data:rndArr(6,5,20),backgroundColor:"#b77900"},{label:"Info",data:rndArr(6,10,40),backgroundColor:"#2563eb"}],{plugins:{legend:{labels:{color:"#4b5563"}}}});
 }
 
 // ── Filters ────────────────────────────────────────────────────────────────────
