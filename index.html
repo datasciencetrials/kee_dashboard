@@ -1,471 +1,978 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>KEE ITS Dashboard | Data Science Trials</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KEE ITS Dashboard | Ministry of Works and Transport</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin=""></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#f4f6f8;color:#111827;font-family:Arial,sans-serif;font-size:13px;}
-:root{--c:#2563eb;--g:#278a50;--p:#b83d6b;--o:#c75a24;--y:#b77900;}
-header{display:flex;align-items:center;gap:14px;padding:10px 18px;background:#fff;border-bottom:1px solid #cbd5e1;}
-header img{height:40px;}
-.brand-mark{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:#111827;color:#fff;font-weight:800;font-size:12px;letter-spacing:.04em;}
-header h1{font-size:17px;color:var(--c);letter-spacing:1px;}
-header p{font-size:11px;color:#4b5563;margin-top:2px;}
-nav{display:flex;background:#fff;border-bottom:1px solid #cbd5e1;overflow-x:auto;}
-nav button{flex:none;padding:11px 20px;background:#fff;border:none;color:#4b5563;cursor:pointer;font-size:12px;letter-spacing:.5px;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s;}
-nav button.active{color:#fff;border-bottom-color:var(--c);background:var(--c);}
-nav button:hover:not(.active){color:#111827;background:#eef4ff;}
-.tab{display:none;padding:16px;}
-.tab.active{display:block;}
-#gf-bar{display:flex;flex-wrap:wrap;gap:10px;padding:10px 18px;background:#f8fafc;border-bottom:1px solid #cbd5e1;align-items:center;}
-#gf-bar label{font-size:11px;color:#374151;display:flex;flex-direction:column;gap:2px;}
-#gf-bar select{background:#fff;border:1px solid #94a3b8;color:#111827;padding:5px 10px;border-radius:8px;font-size:12px;min-width:130px;}
-#gf-bar button{background:#fff;border:1px solid var(--c);color:var(--c);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:11px;margin-top:14px;}
-.kpis{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px;}
-.kpi{background:#fff;border:1px solid #d5dbe3;border-radius:12px;padding:14px 18px;min-width:160px;flex:1;}
-.kpi .val{font-size:26px;font-weight:700;color:var(--c);}
-.kpi .lbl{font-size:11px;color:#4b5563;margin-top:4px;}
-.kpi .delta{font-size:11px;margin-top:3px;}
-.delta.up{color:var(--g);} .delta.dn{color:var(--p);}
-.row{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
-.col{flex:1;min-width:280px;}
-.card{background:#fff;border:1px solid #d5dbe3;border-radius:12px;padding:14px;}
-.card h3{font-size:12px;color:#374151;letter-spacing:.5px;margin-bottom:10px;text-transform:uppercase;}
-.chart-wrap{position:relative;height:260px;}
-.dl-bar{display:flex;gap:8px;margin-bottom:10px;}
-.dl-bar button{background:#fff;border:1px solid var(--c);color:var(--c);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:11px;}
-.dl-bar button:hover{background:var(--c);color:#fff;}
-.tbl-wrap{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:12px;}
-th{background:#eef2f7;color:#111827;padding:8px 10px;text-align:left;border-bottom:1px solid #cbd5e1;white-space:nowrap;}
-td{padding:7px 10px;border-bottom:1px solid #e5e7eb;color:#111827;}
-tr:hover td{background:#eef4ff;}
-.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
-.badge-good{background:rgba(0,255,136,.12);color:var(--g);border:1px solid var(--g);}
-.badge-warn{background:rgba(255,238,0,.12);color:var(--y);border:1px solid var(--y);}
-.badge-bad{background:rgba(255,0,110,.12);color:var(--p);border:1px solid var(--p);}
-.badge-info{background:rgba(0,245,255,.12);color:var(--c);border:1px solid var(--c);}
-.badge-mid{background:rgba(255,102,0,.12);color:var(--o);border:1px solid var(--o);}
-.pg{display:flex;gap:6px;align-items:center;margin-top:10px;flex-wrap:wrap;}
-.pg button{background:#111;border:1px solid #222;color:#aaa;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;}
-.pg button.active{border-color:var(--c);color:var(--c);}
-.pg span{font-size:11px;color:#666;}
-.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
-.s-on{background:var(--g);} .s-off{background:var(--p);} .s-warn{background:var(--y);}
-.vms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:8px;}
-.vms-card{background:#fff;border:1px solid #d5dbe3;border-radius:10px;padding:12px;}
-.vms-card .vms-id{font-size:11px;color:var(--c);font-weight:700;}
-.vms-card .vms-loc{font-size:10px;color:#4b5563;margin:3px 0;}
-.vms-card .vms-msg{font-size:12px;color:#111827;background:#f1f5f9;padding:6px;border-radius:6px;margin:6px 0;min-height:36px;text-align:center;}
-.vms-card .vms-status{font-size:11px;}
-.toll-lane{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:6px;}
+body{background:#F5F5F7;color:#0F172A;font-family:Arial,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;font-size:13px;line-height:1.45;}
+:root{--c:#0071E3;--g:#16A34A;--p:#DC2626;--o:#D97706;--y:#D97706;--v:#7C3AED;--t:#0D9488;}
+header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 20px;background:#FFFFFF;border-bottom:1px solid #E2E8F0;flex-wrap:wrap;}
+.brand-wrap{display:flex;align-items:center;gap:14px;}
+.brand-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#0071E3;color:#FFFFFF;font-weight:700;font-size:13px;letter-spacing:.04em;flex-shrink:0;}
+header h1{font-size:17px;color:#0F172A;letter-spacing:.3px;font-weight:700;}
+header p{font-size:11px;color:#475569;margin-top:2px;}
+.header-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.view-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:#EFF6FF;border:1px solid #BFDBFE;color:#0071E3;font-size:11px;font-weight:700;}
+.vision-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:#F3E8FF;border:1px solid #DDD6FE;color:#7C3AED;font-size:11px;font-weight:700;}
 
-/* ── Mobile responsiveness (additive, does not alter desktop rules above) ── */
+#gf-bar{display:flex;flex-wrap:wrap;gap:12px;padding:10px 20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;align-items:flex-end;}
+#gf-bar label{font-size:11px;color:#475569;font-weight:700;display:flex;flex-direction:column;gap:4px;}
+#gf-bar select{background:#FFFFFF;border:1px solid #E2E8F0;color:#0F172A;padding:6px 10px;border-radius:10px;font-size:12px;min-width:145px;}
+#gf-bar button{background:#FFFFFF;border:1px solid #0071E3;color:#0071E3;padding:6px 14px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:700;}
+#gf-bar button:hover{background:#0071E3;color:#FFFFFF;}
+
+nav{display:flex;background:#FFFFFF;border-bottom:1px solid #E2E8F0;overflow-x:auto;padding:0 12px;gap:4px;}
+nav button{flex:none;padding:12px 16px;background:#FFFFFF;border:none;color:#475569;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.2px;white-space:nowrap;border-bottom:2px solid transparent;border-radius:10px 10px 0 0;transition:all .16s ease;}
+nav button.active{color:#FFFFFF;background:#0071E3;border-bottom-color:#0071E3;}
+nav button:hover:not(.active){color:#0F172A;background:#EFF6FF;}
+
+.tab{display:none;padding:18px 20px;max-width:1600px;margin:0 auto;}
+.tab.active{display:block;}
+
+.timeline-bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;padding:12px 16px;margin-bottom:16px;box-shadow:0 1px 2px rgba(15,23,42,.04);}
+.timeline-bar label{font-size:12px;font-weight:700;color:#0F172A;white-space:nowrap;}
+.timeline-bar input[type="range"]{flex:1;min-width:200px;accent-color:#0071E3;cursor:pointer;}
+.timeline-year{font-size:14px;font-weight:700;color:#0071E3;background:#EFF6FF;border:1px solid #BFDBFE;padding:4px 12px;border-radius:999px;min-width:110px;text-align:center;}
+
+.kpis{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px;}
+.kpi{background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;padding:14px 16px;min-width:170px;flex:1;box-shadow:0 1px 2px rgba(15,23,42,.04);}
+.kpi .val{font-size:24px;font-weight:700;color:#0071E3;}
+.kpi .lbl{font-size:11px;color:#475569;margin-top:4px;font-weight:700;}
+.kpi .delta{font-size:11px;margin-top:4px;color:#475569;}
+.delta.up{color:#16A34A;} .delta.dn{color:#DC2626;}
+
+.row{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
+.col{flex:1;min-width:300px;}
+.card{background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;padding:16px;box-shadow:0 1px 2px rgba(15,23,42,.04);}
+.card h3{font-size:12px;color:#0F172A;letter-spacing:.3px;margin-bottom:10px;text-transform:uppercase;font-weight:700;}
+.chart-wrap{position:relative;height:265px;}
+.dl-bar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.dl-bar button{background:#FFFFFF;border:1px solid #0071E3;color:#0071E3;padding:4px 12px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:700;}
+.dl-bar button:hover{background:#0071E3;color:#FFFFFF;}
+
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;background:#FFFFFF;}
+th{background:#F8FAFC;color:#0F172A;padding:9px 10px;text-align:left;border-bottom:1px solid #E2E8F0;white-space:nowrap;font-weight:700;}
+td{padding:8px 10px;border-bottom:1px solid #E2E8F0;color:#0F172A;}
+tbody tr:hover td{background:#EFF6FF;}
+
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:10px;font-weight:700;}
+.badge-good{background:#DCFCE7;color:#166534;border:1px solid #86EFAC;}
+.badge-warn{background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;}
+.badge-bad{background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;}
+.badge-info{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;}
+.badge-mid{background:#F3E8FF;color:#6D28D9;border:1px solid #DDD6FE;}
+
+.pg{display:flex;gap:6px;align-items:center;margin-top:12px;flex-wrap:wrap;}
+.pg button{background:#FFFFFF;border:1px solid #E2E8F0;color:#0F172A;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:700;}
+.pg button:hover{background:#EFF6FF;border-color:#0071E3;color:#0071E3;}
+.pg button.active{background:#0071E3;border-color:#0071E3;color:#FFFFFF;}
+.pg span{font-size:11px;color:#475569;}
+
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+.s-on{background:#16A34A;} .s-off{background:#DC2626;} .s-warn{background:#D97706;}
+
+.vms-toolbar{display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap;}
+.vms-toolbar select{background:#FFFFFF;border:1px solid #E2E8F0;color:#0F172A;padding:6px 12px;border-radius:10px;font-size:12px;}
+.vms-toolbar button{background:#FFFFFF;border:1px solid #0071E3;color:#0071E3;padding:6px 14px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:700;}
+.vms-toolbar button:hover{background:#0071E3;color:#FFFFFF;}
+
+.vms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:8px;}
+.vms-card{background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:12px;}
+.vms-card .vms-id{font-size:12px;color:#0071E3;font-weight:700;}
+.vms-card .vms-loc{font-size:11px;color:#475569;margin:3px 0;}
+.vms-card .vms-msg{font-size:12px;color:#0F172A;background:#F8FAFC;border:1px solid #E2E8F0;padding:8px;border-radius:8px;margin:6px 0;min-height:40px;text-align:center;font-weight:700;}
+.vms-card .vms-status{font-size:11px;color:#0F172A;display:flex;justify-content:space-between;align-items:center;}
+
+.toll-lane{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;margin-bottom:6px;}
+
+/* Map Layout */
+.map-shell{display:grid;grid-template-columns:1fr 310px;gap:14px;align-items:stretch;}
+#kee-map{height:540px;width:100%;border-radius:14px;border:1px solid #E2E8F0;background:#F8FAFC;}
+.map-side{display:flex;flex-direction:column;gap:12px;}
+.layer-toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;font-size:12px;color:#0F172A;cursor:pointer;}
+.layer-toggle input{accent-color:#0071E3;width:16px;height:16px;cursor:pointer;}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:#0F172A;margin-bottom:6px;}
+.legend-line{width:26px;height:0;border-top:3px solid #0071E3;display:inline-block;}
+.legend-line.unpaved{border-top:2px dotted #D97706;}
+.legend-dot{width:11px;height:11px;border-radius:50%;display:inline-block;}
+
+/* Mind Map */
+.mindmap-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+.mindmap-toolbar button{background:#FFFFFF;border:1px solid #E2E8F0;color:#0F172A;padding:6px 12px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:700;}
+.mindmap-toolbar button.active,.mindmap-toolbar button:hover{background:#0071E3;border-color:#0071E3;color:#FFFFFF;}
+.mindmap-grid{display:grid;grid-template-columns:1fr 320px;gap:14px;}
+.mindmap-canvas{background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;overflow:auto;min-height:480px;position:relative;}
+#mindmap-svg{width:100%;height:480px;display:block;cursor:grab;}
+.mm-node{cursor:pointer;}
+.mm-node rect{transition:all .16s ease;}
+.mm-node:hover rect{stroke-width:2.5;}
+
+/* Documentation */
+.docs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;}
+.doc-card h3{color:#0071E3;margin-bottom:8px;}
+.doc-card p,.doc-card li{font-size:12px;color:#0F172A;margin-bottom:6px;}
+.doc-card ul{padding-left:18px;}
+
+@media (max-width:960px){
+  .map-shell,.mindmap-grid{grid-template-columns:1fr;}
+  #kee-map{height:400px;}
+}
 @media (max-width:768px){
   html,body{overflow-x:hidden;max-width:100%;}
-  body{font-size:12px;}
-  header{padding:10px 14px;gap:10px;flex-wrap:wrap;}
-  header img{height:32px;}
-  .brand-mark{width:32px;height:32px;border-radius:10px;}
-  header h1{font-size:14px;}
-  header p{font-size:10px;}
-  nav{-webkit-overflow-scrolling:touch;}
-  nav button{min-height:44px;padding:0 16px;font-size:12px;display:flex;align-items:center;justify-content:center;}
   .tab{padding:12px;}
   #gf-bar{padding:10px 14px;}
   #gf-bar label{flex:1 1 140px;}
   #gf-bar select{width:100%;min-width:0;min-height:40px;}
-  #gf-bar button{margin-top:0;align-self:flex-end;}
   .kpis{flex-direction:column;}
   .kpi{width:100%;min-width:0;}
-  .kpi .val{font-size:22px;}
   .row{flex-direction:column;}
   .col{width:100%;min-width:0;}
   .chart-wrap{height:230px;}
-  .tbl-wrap{-webkit-overflow-scrolling:touch;}
-  table{font-size:11px;}
-  th,td{padding:9px 8px;}
-  #tab-vms > div:not([id]){flex-wrap:wrap;}
-  #vms-filter{width:100%;}
-  .vms-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
-  .toll-lane{flex-wrap:wrap;row-gap:4px;}
-  button,select{min-height:44px;}
-  .dl-bar button,.pg button{padding:0 14px;}
-}
-
-@media (max-width:480px){
-  body{font-size:11px;}
-  header h1{font-size:13px;}
-  header p{font-size:9px;}
-  .kpi .val{font-size:20px;}
-  .chart-wrap{height:200px;}
-  .vms-grid{grid-template-columns:1fr;}
-  nav button{padding:0 14px;font-size:11px;}
-  th,td{padding:7px 6px;font-size:10px;}
+  .vms-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
 }
 </style>
-  <link rel="stylesheet" href="./apple-system.css?v=20261116-2">
+<link rel="stylesheet" href="./apple-system.css?v=20261119">
 </head>
 <body>
 <header>
-<span class="brand-mark" aria-hidden="true">DST</span>
-<div><h1>KEE ITS DASHBOARD</h1><p>Data Science Trials | Modelled historical ITS learning workspace</p></div>
+  <div class="brand-wrap">
+    <span class="brand-mark" aria-hidden="true">MoWT</span>
+    <div>
+      <h1>KEE ITS DASHBOARD</h1>
+      <p>Ministry of Works and Transport | Department of National Roads | View-Only Corridor &amp; Network Intelligence</p>
+    </div>
+  </div>
+  <div class="header-meta">
+    <span class="view-pill">View-Only Portal</span>
+    <span class="vision-pill">Vision 2040 Aligned</span>
+  </div>
 </header>
 
 <div id="gf-bar">
-<label>Highway<select id="gf-highway" onchange="applyGF()"><option value="">All Highways</option></select></label>
-<label>Direction<select id="gf-dir" onchange="applyGF()"><option value="">All Directions</option></select></label>
-<label>Fiscal Year<select id="gf-fy" onchange="applyGF()"><option value="">All FYs</option></select></label>
-<label>Station<select id="gf-stn" onchange="applyGF()"><option value="">All Stations</option></select></label>
-<button onclick="resetGF()">Reset</button>
+  <label>Highway
+    <select id="gf-highway" onchange="applyGF()">
+      <option value="">All Highways</option>
+      <option value="KEE Mainline">KEE Mainline</option>
+      <option value="Munyonyo Spur">Munyonyo Spur</option>
+    </select>
+  </label>
+  <label>Direction
+    <select id="gf-dir" onchange="applyGF()">
+      <option value="">All Directions</option>
+      <option value="Kampala to Entebbe">Kampala to Entebbe</option>
+      <option value="Entebbe to Kampala">Entebbe to Kampala</option>
+    </select>
+  </label>
+  <label>Fiscal Year
+    <select id="gf-fy" onchange="applyGF()">
+      <option value="">All FYs (2016 to 2040)</option>
+      <option value="FY 2023/24">FY 2023/24</option>
+      <option value="FY 2024/25">FY 2024/25</option>
+      <option value="FY 2025/26">FY 2025/26</option>
+      <option value="Vision 2040">Vision 2040 Projection</option>
+    </select>
+  </label>
+  <label>Station
+    <select id="gf-stn" onchange="applyGF()">
+      <option value="">All Stations</option>
+      <option value="Busega">Busega</option>
+      <option value="Kajjansi">Kajjansi</option>
+      <option value="Mpala">Mpala</option>
+    </select>
+  </label>
+  <button type="button" onclick="resetGF()">Reset</button>
 </div>
 
-<nav>
-<button class="active" onclick="showTab('its',this)">ITS Overview</button>
-<button onclick="showTab('incidents',this)">Incident Management</button>
-<button onclick="showTab('vms',this)">VMS Boards</button>
-<button onclick="showTab('enforce',this)">Enforcement</button>
-<button onclick="showTab('toll',this)">Toll Revenue</button>
-<button onclick="showTab('admin',this)">Administration</button>
+<nav role="tablist" aria-label="Dashboard Sections">
+  <button type="button" role="tab" aria-selected="true" class="active" onclick="showTab('its',this)">ITS Overview</button>
+  <button type="button" role="tab" aria-selected="false" onclick="showTab('map',this)">Geospatial Map</button>
+  <button type="button" role="tab" aria-selected="false" onclick="showTab('incidents',this)">Incident Management</button>
+  <button type="button" role="tab" aria-selected="false" onclick="showTab('vms',this)">VMS Boards</button>
+  <button type="button" role="tab" aria-selected="false" onclick="showTab('enforce',this)">Enforcement</button>
+  <button type="button" role="tab" aria-selected="false" onclick="showTab('toll',this)">Toll Revenue</button>
+  <button type="button" role="tab" aria-selected="false" onclick="showTab('mindmap',this)">Mind Map</button>
+  <button type="button" role="tab" aria-selected="false" onclick="showTab('docs',this)">Platform Documentation</button>
 </nav>
 
 <!-- ITS Overview -->
-<div id="tab-its" class="tab active">
-<div class="kpis" id="kpis-its">
-<div class="kpi"><div class="val" id="kv-aadt">—</div><div class="lbl">Avg Daily Traffic (AADT)</div><div class="delta" id="kd-aadt"></div></div>
-<div class="kpi"><div class="val" id="kv-inc">—</div><div class="lbl">Active Incidents</div><div class="delta dn" id="kd-inc"></div></div>
-<div class="kpi"><div class="val" id="kv-vms">—</div><div class="lbl">VMS Boards Online</div><div class="delta" id="kd-vms"></div></div>
-<div class="kpi"><div class="val" id="kv-toll">—</div><div class="lbl">Toll Revenue Today (UGX)</div><div class="delta up" id="kd-toll"></div></div>
-<div class="kpi"><div class="val" id="kv-speed">—</div><div class="lbl">Avg Speed (km/h)</div><div class="delta" id="kd-speed"></div></div>
-</div>
-<div class="row">
-<div class="col card"><h3>Traffic Volume by FY — Stacked by Vehicle Type</h3><div class="dl-bar"><button onclick="dlPNG('ch-vol-stk')">PNG</button><button onclick="dlCSV('ch-vol-stk')">CSV</button></div><div class="chart-wrap"><canvas id="ch-vol-stk"></canvas></div></div>
-<div class="col card"><h3>Traffic Volume by FY — Clustered by Direction</h3><div class="dl-bar"><button onclick="dlPNG('ch-vol-clu')">PNG</button><button onclick="dlCSV('ch-vol-clu')">CSV</button></div><div class="chart-wrap"><canvas id="ch-vol-clu"></canvas></div></div>
-</div>
-<div class="row">
-<div class="col card"><h3>Hourly Traffic Distribution (Avg)</h3><div class="dl-bar"><button onclick="dlPNG('ch-hourly')">PNG</button><button onclick="dlCSV('ch-hourly')">CSV</button></div><div class="chart-wrap"><canvas id="ch-hourly"></canvas></div></div>
-<div class="col card"><h3>Vehicle Class Mix (%)</h3><div class="dl-bar"><button onclick="dlPNG('ch-class')">PNG</button></div><div class="chart-wrap"><canvas id="ch-class"></canvas></div></div>
-</div>
-</div>
+<section id="tab-its" class="tab active">
+  <div class="timeline-bar">
+    <label for="vision-slider">Vision 2040 Timeline Projection:</label>
+    <input id="vision-slider" type="range" min="2016" max="2040" step="1" value="2026" oninput="updateVisionYear(this.value)">
+    <span class="timeline-year" id="vision-year-badge">Year: 2026</span>
+    <span id="vision-note" style="font-size:12px;color:#475569;">Current Baseline (FY 2025/26) | Authoritative National Network: 21,284.02 km</span>
+  </div>
+
+  <div class="kpis" id="kpis-its">
+    <div class="kpi"><div class="val" id="kv-aadt">24,380</div><div class="lbl">Corridor AADT (veh/day)</div><div class="delta up" id="kd-aadt">+3.2% annual growth</div></div>
+    <div class="kpi"><div class="val" id="kv-net" style="color:#0D9488;">21,284.02 km</div><div class="lbl">National Road Network</div><div class="delta" id="kd-net">6,406.69 km Paved | 14,877.33 km Unpaved</div></div>
+    <div class="kpi"><div class="val" id="kv-struct" style="color:#7C3AED;">552 / 452</div><div class="lbl">Bridges / Major Culverts</div><div class="delta" id="kd-struct">Includes B162 Atari Bridge</div></div>
+    <div class="kpi"><div class="val" id="kv-vms" style="color:#16A34A;">18 / 20</div><div class="lbl">VMS Boards Online</div><div class="delta up" id="kd-vms">90.0% operational</div></div>
+    <div class="kpi"><div class="val" id="kv-toll" style="color:#0071E3;">UGX 82.4M</div><div class="lbl">Daily Toll Revenue</div><div class="delta up" id="kd-toll">Corridor throughput</div></div>
+    <div class="kpi"><div class="val" id="kv-speed" style="color:#D97706;">78 km/h</div><div class="lbl">Average Corridor Speed</div><div class="delta" id="kd-speed">Expressways: 144.56 km</div></div>
+  </div>
+
+  <div class="row">
+    <div class="col card">
+      <h3>Traffic Volume Trajectory to Vision 2040: Stacked by Vehicle Class</h3>
+      <div class="dl-bar"><button type="button" onclick="dlPNG('ch-vol-stk')">PNG</button><button type="button" onclick="dlCSV('ch-vol-stk')">CSV</button></div>
+      <div class="chart-wrap"><canvas id="ch-vol-stk"></canvas></div>
+    </div>
+    <div class="col card">
+      <h3>Corridor Volume to Vision 2040: Clustered by Direction</h3>
+      <div class="dl-bar"><button type="button" onclick="dlPNG('ch-vol-clu')">PNG</button><button type="button" onclick="dlCSV('ch-vol-clu')">CSV</button></div>
+      <div class="chart-wrap"><canvas id="ch-vol-clu"></canvas></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col card">
+      <h3>Hourly Traffic Distribution (Average Profile)</h3>
+      <div class="dl-bar"><button type="button" onclick="dlPNG('ch-hourly')">PNG</button><button type="button" onclick="dlCSV('ch-hourly')">CSV</button></div>
+      <div class="chart-wrap"><canvas id="ch-hourly"></canvas></div>
+    </div>
+    <div class="col card">
+      <h3>National Road Network Surface &amp; Class Breakdown (km)</h3>
+      <div class="dl-bar"><button type="button" onclick="dlPNG('ch-class')">PNG</button><button type="button" onclick="dlCSV('ch-class')">CSV</button></div>
+      <div class="chart-wrap"><canvas id="ch-class"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- Geospatial Map -->
+<section id="tab-map" class="tab">
+  <div class="kpis">
+    <div class="kpi"><div class="val">144.56 km</div><div class="lbl">National Expressways</div><div class="delta">KEE Mainline &amp; Munyonyo Spur</div></div>
+    <div class="kpi"><div class="val" style="color:#16A34A;">6,406.69 km</div><div class="lbl">Paved National Roads (30.10%)</div><div class="delta">Solid cartographic width</div></div>
+    <div class="kpi"><div class="val" style="color:#D97706;">14,877.33 km</div><div class="lbl">Unpaved National Roads (69.90%)</div><div class="delta">Dotted 0.58x width</div></div>
+    <div class="kpi"><div class="val" style="color:#7C3AED;">552 / 452</div><div class="lbl">Bridges / Major Culverts</div><div class="delta">B162 Atari Bridge mapped</div></div>
+  </div>
+  <div class="map-shell">
+    <div class="card" style="padding:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+        <h3 style="margin:0;">Esri World Imagery + Hybrid Labels: KEE Corridor &amp; National Structures</h3>
+        <div class="dl-bar" style="margin:0;">
+          <button type="button" onclick="zoomMap('kee')">Focus KEE Corridor</button>
+          <button type="button" onclick="zoomMap('b162')">Locate B162 Atari Bridge</button>
+          <button type="button" onclick="zoomMap('uganda')">National View</button>
+        </div>
+      </div>
+      <div id="kee-map"></div>
+    </div>
+    <div class="map-side">
+      <div class="card">
+        <h3>Map Layers</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label class="layer-toggle"><span>KEE Corridor &amp; Expressways</span><input type="checkbox" checked onchange="toggleLayer('corridor',this.checked)"></label>
+          <label class="layer-toggle"><span>Toll Plazas &amp; Weighbridges</span><input type="checkbox" checked onchange="toggleLayer('plazas',this.checked)"></label>
+          <label class="layer-toggle"><span>VMS Boards (20 Units)</span><input type="checkbox" checked onchange="toggleLayer('vms',this.checked)"></label>
+          <label class="layer-toggle"><span>Key Bridges (incl. B162 Atari Bridge)</span><input type="checkbox" checked onchange="toggleLayer('bridges',this.checked)"></label>
+          <label class="layer-toggle"><span>Live Corridor Traffic Flow (25 FPS)</span><input type="checkbox" checked onchange="toggleLayer('flow',this.checked)"></label>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Cartographic Legend</h3>
+        <div class="legend-item"><span class="legend-line" style="border-color:#0071E3;"></span><span>Paved Expressway / Trunk (6,406.69 km)</span></div>
+        <div class="legend-item"><span class="legend-line unpaved"></span><span>Unpaved Network (14,877.33 km)</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#16A34A;"></span><span>Toll Plaza / ATC Station</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#7C3AED;"></span><span>VMS Board / Weighbridge</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#DC2626;"></span><span>Critical Bridge (B162 Atari Bridge)</span></div>
+        <p style="font-size:11px;color:#475569;margin-top:8px;">Basemap: Esri World Imagery with World Boundaries, Places, and Transportation hybrid labels. Coordinates in decimal degrees.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- Incident Management -->
-<div id="tab-incidents" class="tab">
-<div class="kpis" id="kpis-inc"></div>
-<div class="row">
-<div class="col card"><h3>Incidents by Month — Stacked by Type</h3><div class="dl-bar"><button onclick="dlPNG('ch-inc-stk')">PNG</button><button onclick="dlCSV('ch-inc-stk')">CSV</button></div><div class="chart-wrap"><canvas id="ch-inc-stk"></canvas></div></div>
-<div class="col card"><h3>Incidents by Month — Clustered by Severity</h3><div class="dl-bar"><button onclick="dlPNG('ch-inc-sev')">PNG</button><button onclick="dlCSV('ch-inc-sev')">CSV</button></div><div class="chart-wrap"><canvas id="ch-inc-sev"></canvas></div></div>
-</div>
-<div class="row">
-<div class="col card"><h3>Response Time Distribution (min)</h3><div class="dl-bar"><button onclick="dlPNG('ch-resp')">PNG</button></div><div class="chart-wrap"><canvas id="ch-resp"></canvas></div></div>
-<div class="col card"><h3>Incident Hotspot Locations</h3><div class="dl-bar"><button onclick="dlPNG('ch-hotspot')">PNG</button></div><div class="chart-wrap"><canvas id="ch-hotspot"></canvas></div></div>
-</div>
-<div class="card" style="margin-top:4px;">
-<h3>Active Incident Log</h3>
-<div class="tbl-wrap"><table id="inc-tbl">
-<thead><tr><th>ID</th><th>Time</th><th>Location</th><th>Type</th><th>Severity</th><th>Status</th><th>Response (min)</th></tr></thead>
-<tbody id="inc-tbody"></tbody>
-</table></div>
-<div class="pg" id="inc-pg"></div>
-</div>
-</div>
+<section id="tab-incidents" class="tab">
+  <div class="kpis" id="kpis-inc"></div>
+  <div class="row">
+    <div class="col card"><h3>Incidents by Month: Stacked by Type</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-inc-stk')">PNG</button><button type="button" onclick="dlCSV('ch-inc-stk')">CSV</button></div><div class="chart-wrap"><canvas id="ch-inc-stk"></canvas></div></div>
+    <div class="col card"><h3>Incidents by Month: Clustered by Severity</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-inc-sev')">PNG</button><button type="button" onclick="dlCSV('ch-inc-sev')">CSV</button></div><div class="chart-wrap"><canvas id="ch-inc-sev"></canvas></div></div>
+  </div>
+  <div class="row">
+    <div class="col card"><h3>Response Time Distribution (min)</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-resp')">PNG</button></div><div class="chart-wrap"><canvas id="ch-resp"></canvas></div></div>
+    <div class="col card"><h3>Incident Hotspot Locations</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-hotspot')">PNG</button></div><div class="chart-wrap"><canvas id="ch-hotspot"></canvas></div></div>
+  </div>
+  <div class="card">
+    <h3>Active Incident Log (Dates in dd/mm/yyyy)</h3>
+    <div class="tbl-wrap"><table id="inc-tbl">
+      <thead><tr><th>Incident ID</th><th>Timestamp (dd/mm/yyyy)</th><th>Location</th><th>Type</th><th>Severity</th><th>Status</th><th>Response (min)</th></tr></thead>
+      <tbody id="inc-tbody"></tbody>
+    </table></div>
+    <div class="pg" id="inc-pg"></div>
+  </div>
+</section>
 
 <!-- VMS Boards -->
-<div id="tab-vms" class="tab">
-<div class="kpis" id="kpis-vms"></div>
-<div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;">
-<select id="vms-filter" style="background:#111;border:1px solid var(--c);color:#fff;padding:6px 10px;border-radius:4px;font-size:12px;" onchange="renderVMS()"><option value="">All Statuses</option><option value="online">Online</option><option value="offline">Offline</option><option value="warning">Warning</option></select>
-<button onclick="dlVMSCSV()" style="background:#111;border:1px solid var(--c);color:var(--c);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px;">Export CSV</button>
-</div>
-<div class="vms-grid" id="vms-grid"></div>
-<div class="row" style="margin-top:14px;">
-<div class="col card"><h3>VMS Uptime by Month (%)</h3><div class="dl-bar"><button onclick="dlPNG('ch-vms-up')">PNG</button></div><div class="chart-wrap"><canvas id="ch-vms-up"></canvas></div></div>
-<div class="col card"><h3>Message Category Distribution</h3><div class="dl-bar"><button onclick="dlPNG('ch-vms-cat')">PNG</button></div><div class="chart-wrap"><canvas id="ch-vms-cat"></canvas></div></div>
-</div>
-</div>
+<section id="tab-vms" class="tab">
+  <div class="kpis" id="kpis-vms"></div>
+  <div class="vms-toolbar">
+    <select id="vms-filter" onchange="renderVMS()" aria-label="Filter VMS status">
+      <option value="">All Statuses</option>
+      <option value="online">Online</option>
+      <option value="offline">Offline</option>
+      <option value="warning">Warning</option>
+    </select>
+    <button type="button" onclick="dlVMSCSV()">Export CSV</button>
+  </div>
+  <div class="vms-grid" id="vms-grid"></div>
+  <div class="row" style="margin-top:14px;">
+    <div class="col card"><h3>VMS Uptime by Month (%)</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-vms-up')">PNG</button></div><div class="chart-wrap"><canvas id="ch-vms-up"></canvas></div></div>
+    <div class="col card"><h3>Message Category Distribution</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-vms-cat')">PNG</button></div><div class="chart-wrap"><canvas id="ch-vms-cat"></canvas></div></div>
+  </div>
+</section>
 
 <!-- Enforcement -->
-<div id="tab-enforce" class="tab">
-<div class="kpis" id="kpis-enf"></div>
-<div class="row">
-<div class="col card"><h3>Violations by Month — Stacked by Type</h3><div class="dl-bar"><button onclick="dlPNG('ch-viol-stk')">PNG</button><button onclick="dlCSV('ch-viol-stk')">CSV</button></div><div class="chart-wrap"><canvas id="ch-viol-stk"></canvas></div></div>
-<div class="col card"><h3>Violations by Month — Clustered by Station</h3><div class="dl-bar"><button onclick="dlPNG('ch-viol-stn')">PNG</button><button onclick="dlCSV('ch-viol-stn')">CSV</button></div><div class="chart-wrap"><canvas id="ch-viol-stn"></canvas></div></div>
-</div>
-<div class="row">
-<div class="col card"><h3>Fines Collected (UGX) by Month</h3><div class="dl-bar"><button onclick="dlPNG('ch-fines')">PNG</button><button onclick="dlCSV('ch-fines')">CSV</button></div><div class="chart-wrap"><canvas id="ch-fines"></canvas></div></div>
-<div class="col card"><h3>Violation Type Breakdown</h3><div class="dl-bar"><button onclick="dlPNG('ch-viol-type')">PNG</button></div><div class="chart-wrap"><canvas id="ch-viol-type"></canvas></div></div>
-</div>
-<div class="card">
-<h3>Enforcement Log</h3>
-<div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Station</th><th>Violation</th><th>Fine (UGX)</th><th>Status</th></tr></thead>
-<tbody id="enf-tbody"></tbody></table></div>
-</div>
-</div>
+<section id="tab-enforce" class="tab">
+  <div class="kpis" id="kpis-enf"></div>
+  <div class="row">
+    <div class="col card"><h3>Violations by Month: Stacked by Type</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-viol-stk')">PNG</button><button type="button" onclick="dlCSV('ch-viol-stk')">CSV</button></div><div class="chart-wrap"><canvas id="ch-viol-stk"></canvas></div></div>
+    <div class="col card"><h3>Violations by Month: Clustered by Station</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-viol-stn')">PNG</button><button type="button" onclick="dlCSV('ch-viol-stn')">CSV</button></div><div class="chart-wrap"><canvas id="ch-viol-stn"></canvas></div></div>
+  </div>
+  <div class="row">
+    <div class="col card"><h3>Fines Collected (UGX Millions) by Month</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-fines')">PNG</button><button type="button" onclick="dlCSV('ch-fines')">CSV</button></div><div class="chart-wrap"><canvas id="ch-fines"></canvas></div></div>
+    <div class="col card"><h3>Violation Type Breakdown</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-viol-type')">PNG</button></div><div class="chart-wrap"><canvas id="ch-viol-type"></canvas></div></div>
+  </div>
+  <div class="card">
+    <h3>Enforcement Log (Dates in dd/mm/yyyy)</h3>
+    <div class="tbl-wrap"><table><thead><tr><th>Date (dd/mm/yyyy)</th><th>Station</th><th>Violation</th><th>Fine (UGX)</th><th>Status</th></tr></thead>
+      <tbody id="enf-tbody"></tbody></table></div>
+  </div>
+</section>
 
 <!-- Toll Revenue -->
-<div id="tab-toll" class="tab">
-<div class="kpis" id="kpis-toll"></div>
-<div class="row">
-<div class="col card"><h3>Toll Revenue by FY (UGX Bn) — Stacked by Plaza</h3><div class="dl-bar"><button onclick="dlPNG('ch-toll-stk')">PNG</button><button onclick="dlCSV('ch-toll-stk')">CSV</button></div><div class="chart-wrap"><canvas id="ch-toll-stk"></canvas></div></div>
-<div class="col card"><h3>Toll Revenue by FY — Clustered by Vehicle Class</h3><div class="dl-bar"><button onclick="dlPNG('ch-toll-clu')">PNG</button><button onclick="dlCSV('ch-toll-clu')">CSV</button></div><div class="chart-wrap"><canvas id="ch-toll-clu"></canvas></div></div>
-</div>
-<div class="row">
-<div class="col card"><h3>Daily Revenue Trend (Last 30 Days)</h3><div class="dl-bar"><button onclick="dlPNG('ch-toll-daily')">PNG</button></div><div class="chart-wrap"><canvas id="ch-toll-daily"></canvas></div></div>
-<div class="col card"><h3>Transaction Volume by Hour</h3><div class="dl-bar"><button onclick="dlPNG('ch-toll-hr')">PNG</button></div><div class="chart-wrap"><canvas id="ch-toll-hr"></canvas></div></div>
-</div>
-<div class="card">
-<h3>Toll Plaza Lane Status</h3>
-<div id="toll-lanes"></div>
-</div>
-</div>
+<section id="tab-toll" class="tab">
+  <div class="kpis" id="kpis-toll"></div>
+  <div class="row">
+    <div class="col card"><h3>Toll Revenue Trajectory to Vision 2040 (UGX Bn): Stacked by Plaza</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-toll-stk')">PNG</button><button type="button" onclick="dlCSV('ch-toll-stk')">CSV</button></div><div class="chart-wrap"><canvas id="ch-toll-stk"></canvas></div></div>
+    <div class="col card"><h3>Toll Revenue by FY: Clustered by Vehicle Class</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-toll-clu')">PNG</button><button type="button" onclick="dlCSV('ch-toll-clu')">CSV</button></div><div class="chart-wrap"><canvas id="ch-toll-clu"></canvas></div></div>
+  </div>
+  <div class="row">
+    <div class="col card"><h3>Daily Revenue Trend (Last 30 Days)</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-toll-daily')">PNG</button></div><div class="chart-wrap"><canvas id="ch-toll-daily"></canvas></div></div>
+    <div class="col card"><h3>Transaction Volume by Hour</h3><div class="dl-bar"><button type="button" onclick="dlPNG('ch-toll-hr')">PNG</button></div><div class="chart-wrap"><canvas id="ch-toll-hr"></canvas></div></div>
+  </div>
+  <div class="card">
+    <h3>Toll Plaza Lane Status</h3>
+    <div id="toll-lanes"></div>
+  </div>
+</section>
 
-<!-- Administration -->
-<div id="tab-admin" class="tab">
-<div class="kpis" id="kpis-adm"></div>
-<div class="row">
-<div class="col card"><h3>System Health</h3>
-<div id="sys-health" style="display:flex;flex-direction:column;gap:8px;margin-top:6px;"></div></div>
-<div class="col card"><h3>ITS Device Uptime (Last 6 Months)</h3><div class="dl-bar"><button onclick="dlPNG('ch-adm-up')">PNG</button></div><div class="chart-wrap"><canvas id="ch-adm-up"></canvas></div></div>
-</div>
-<div class="row">
-<div class="col card"><h3>Data Sync Status by Source</h3><div class="dl-bar"><button onclick="dlPNG('ch-sync')">PNG</button></div><div class="chart-wrap"><canvas id="ch-sync"></canvas></div></div>
-<div class="col card"><h3>Alert Volume by Week</h3><div class="dl-bar"><button onclick="dlPNG('ch-alerts')">PNG</button></div><div class="chart-wrap"><canvas id="ch-alerts"></canvas></div></div>
-</div>
-</div>
+<!-- Interactive Mind Map -->
+<section id="tab-mindmap" class="tab">
+  <div class="mindmap-toolbar">
+    <button type="button" class="active" onclick="filterMindMap('all',this)">All Domains</button>
+    <button type="button" onclick="filterMindMap('network',this)">National Network</button>
+    <button type="button" onclick="filterMindMap('its',this)">KEE ITS Operations</button>
+    <button type="button" onclick="filterMindMap('structures',this)">Bridges &amp; Culverts</button>
+    <button type="button" onclick="filterMindMap('tools',this)">Survey Tools &amp; Vision 2040</button>
+    <button type="button" onclick="zoomMindMap(1.15)">Zoom In</button>
+    <button type="button" onclick="zoomMindMap(0.87)">Zoom Out</button>
+    <button type="button" onclick="zoomMindMap(0)">Reset View</button>
+  </div>
+  <div class="mindmap-grid">
+    <div class="mindmap-canvas">
+      <svg id="mindmap-svg" viewBox="0 0 1000 520" role="img" aria-label="KEE ITS and National Road Network Interactive Mind Map"></svg>
+    </div>
+    <div class="card" id="mm-detail">
+      <h3>Node Inspector</h3>
+      <p style="font-size:12px;color:#475569;margin-bottom:10px;">Select any node in the Mind Map to inspect its authoritative parameters, engineering standards, and Vision 2040 targets.</p>
+      <div id="mm-detail-body">
+        <div class="toll-lane"><strong>Root Node</strong><span class="badge badge-info">MoWT DNR</span></div>
+        <p style="font-size:12px;color:#0F172A;margin-top:8px;"><strong>Ministry of Works and Transport:</strong> Department of National Roads oversees 21,284.02 km of National Roads (6,406.69 km paved and 14,877.33 km unpaved), 144.56 km of Expressways, 552 bridges, and 452 major culverts.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Platform Documentation -->
+<section id="tab-docs" class="tab">
+  <div class="docs-grid">
+    <div class="card doc-card">
+      <h3>1. View-Only Architecture &amp; Scope</h3>
+      <p>The KEE ITS Dashboard is a strictly view-only analytical portal operated by the Ministry of Works and Transport (MoWT), Department of National Roads. It provides real-time corridor monitoring, historic trends, and Vision 2040 projections without user data entry or administrative access controls.</p>
+      <ul>
+        <li>Corridor coverage: Kampala to Entebbe Expressway (KEE Mainline) and Munyonyo Spur.</li>
+        <li>Primary monitoring stations: Busega, Kajjansi, and Mpala.</li>
+        <li>All analytics support PNG and CSV downloads.</li>
+      </ul>
+    </div>
+    <div class="card doc-card">
+      <h3>2. Authoritative Network &amp; Structure Baselines</h3>
+      <ul>
+        <li><strong>National Road Network:</strong> 21,284.02 km total extent (6,406.69 km paved, 30.10%; 14,877.33 km unpaved, 69.90%).</li>
+        <li><strong>Functional Classes:</strong> International Trunk Roads (2,604.65 km), National Trunk Roads (2,845.27 km), Primary Roads (15,689.54 km), and Expressways (144.56 km).</li>
+        <li><strong>Bridges:</strong> 552 structures (Good 247, Satisfactory 71, Marginal 162, Poor 52, Critical 13, Under Construction 7). Key monitored structure: <strong>B162 Atari Bridge</strong> (Muyembe to Namalu, Eastern Region).</li>
+        <li><strong>Major Culverts:</strong> 452 structures (Good 403, Satisfactory 39, Marginal 4, Poor 1, Critical 4, Under Construction 1).</li>
+      </ul>
+    </div>
+    <div class="card doc-card">
+      <h3>3. Mandatory Survey Tool Standards</h3>
+      <p>Pavement and corridor condition assessments integrated into this platform use the Ministry's standardised equipment:</p>
+      <ul>
+        <li><strong>MOBICAP(Road condition assesment tool):</strong> Mobile visual and geometric condition capture along paved and unpaved corridors.</li>
+        <li><strong>ROMDAS(Roughness and rutting machine based testing):</strong> Machine-based International Roughness Index (IRI) and rut depth measurements.</li>
+      </ul>
+    </div>
+    <div class="card doc-card">
+      <h3>4. Vision 2040 Projection &amp; Data Standards</h3>
+      <ul>
+        <li><strong>Vision 2040 Alignment:</strong> Traffic demand (AADT) and toll revenue trajectories are projected to 2040 using an annual corridor growth factor of 3.2% to 4.5%.</li>
+        <li><strong>Date Standard:</strong> All timestamps and registers strictly follow <strong>dd/mm/yyyy</strong> formatting.</li>
+        <li><strong>Units &amp; Coordinates:</strong> Metric units (km, m, mm, T, km/h) and geographic coordinates in decimal degrees.</li>
+        <li><strong>Reporting Discipline:</strong> Road extent is strictly expressed in kilometres (km) and percentages (%).</li>
+      </ul>
+    </div>
+  </div>
+</section>
 
 <script>
-window.SUPABASE_URL="https://vbidhkvzjigatfygnycg.supabase.co";
-window.SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiaWRoa3Z6amlnYXRmeWdueWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3Mzg0NDQsImV4cCI6MjA5NzMxNDQ0NH0.4M5lsUvcoh2giNpbF5X7nMPepNVp1U9Em6Ro4aZwgY4";
-window.MOWT_CONFIG={};
-function cfg(k,fb){var v=window.MOWT_CONFIG[k];return(v!==undefined&&v!==null&&v!=="")? v:(fb!==undefined?fb:"");}
-function cfgF(k,fb){return parseFloat(cfg(k,String(fb!==undefined?fb:0)));}
-function cfgI(k,fb){return parseInt(cfg(k,String(fb!==undefined?fb:0)),10);}
-function cfgArr(k,fb){var v=cfg(k,Array.isArray(fb)?fb.join(","):(fb||""));return v?v.split(",").map(function(s){return s.trim();}).filter(Boolean):[];}
-var SBH={"apikey":window.SUPABASE_ANON_KEY,"Authorization":"Bearer "+window.SUPABASE_ANON_KEY};
-function sbFetch(p){return fetch(window.SUPABASE_URL+"/rest/v1/"+p,{headers:SBH}).then(function(r){return r.json();});}
-var DEFAULT_OPTS={
-  fiscal_year:[{value:"FY 2024/25",label:"FY 2024/25"},{value:"FY 2025/26",label:"FY 2025/26"}],
-  vehicle_class:[{value:"Class 1",label:"Class 1 - Motorcycles"},{value:"Class 2",label:"Class 2 - Saloon Cars"},{value:"Class 3",label:"Class 3 - Light Goods"},{value:"Class 4",label:"Class 4 - Medium Trucks"},{value:"Class 5",label:"Class 5 - Heavy Trucks"}],
-  highway:[{value:"KEE Mainline",label:"KEE Mainline"},{value:"Munyonyo Spur",label:"Munyonyo Spur"}],
-  incident_type:[{value:"Breakdown",label:"Breakdown"},{value:"Accident",label:"Accident"},{value:"Obstruction",label:"Obstruction"},{value:"Weather Event",label:"Weather Event"}],
-  vms_category:[{value:"Warning",label:"Warning"},{value:"Speed Limit",label:"Speed Limit"},{value:"Toll Tariff",label:"Toll Tariff"},{value:"Public Notice",label:"Public Notice"}],
-  violation_type:[{value:"Overload",label:"Overload"},{value:"Speeding",label:"Speeding"},{value:"Toll Evasion",label:"Toll Evasion"}],
-  enforcement_station:[{value:"Busega Weighbridge",label:"Busega Weighbridge"},{value:"Kajjansi Weighbridge",label:"Kajjansi Weighbridge"},{value:"Mpala Weighbridge",label:"Mpala Weighbridge"}],
-  toll_plaza:[{value:"Busega Plaza",label:"Busega Plaza"},{value:"Kajjansi Plaza",label:"Kajjansi Plaza"},{value:"Mpala Plaza",label:"Mpala Plaza"}],
-  direction:[{value:"Kampala - Entebbe",label:"Kampala - Entebbe"},{value:"Entebbe - Kampala",label:"Entebbe - Kampala"}],
-  station:[{value:"Busega",label:"Busega"},{value:"Kajjansi",label:"Kajjansi"},{value:"Mpala",label:"Mpala"}]
-};
-function getOpts(db,f){
-  return fetch(window.SUPABASE_URL+"/rest/v1/ref_categories?select=value,label&order=sort_order.asc,label.asc&dashboard=eq."+encodeURIComponent(db)+"&field=eq."+encodeURIComponent(f),{headers:SBH})
-    .then(function(r){return r.ok?r.json():[];})
-    .then(function(rows){return (Array.isArray(rows)&&rows.length>0)?rows:(DEFAULT_OPTS[f]||[]);})
-    .catch(function(){return DEFAULT_OPTS[f]||[];});
-}
-function loadConfig(){return fetch(window.SUPABASE_URL+"/rest/v1/config?select=*",{headers:SBH}).then(function(r){return r.json();}).then(function(rows){if(Array.isArray(rows))rows.forEach(function(row){if(row&&row.key)window.MOWT_CONFIG[row.key]=row.value;});}).catch(function(e){console.warn("[KEE]",e.message);});}
+var COL = ["#0071E3", "#16A34A", "#D97706", "#DC2626", "#7C3AED", "#0D9488", "#0284C7"];
+var CH = {};
+var GF = {highway: "", dir: "", fy: "", stn: ""};
+var VISION_YEAR = 2026;
 
-var CH={};
-function mkChart(id,type,labels,datasets,opts){
-  var el=document.getElementById(id);if(!el)return;
-  if(CH[id])CH[id].destroy();
-  CH[id]=new Chart(el.getContext("2d"),{type:type,data:{labels:labels,datasets:datasets},options:Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:"#374151",font:{size:11,family:"Arial"}}}},scales:{x:{ticks:{color:"#4b5563"},grid:{color:"#e5e7eb"}},y:{ticks:{color:"#4b5563"},grid:{color:"#e5e7eb"}}}},opts||{})});
+function fmtDate(d) {
+  var dd = String(d.getDate()).padStart(2, "0");
+  var mm = String(d.getMonth() + 1).padStart(2, "0");
+  var yyyy = d.getFullYear();
+  return dd + "/" + mm + "/" + yyyy;
 }
-function mkDoughnut(id,labels,data,colors){mkChart(id,"doughnut",labels,[{data:data,backgroundColor:colors,borderWidth:0}],{plugins:{legend:{position:"right",labels:{color:"#4b5563",font:{size:10}}}}});}
-function mkHBar(id,labels,datasets,opts){mkChart(id,"bar",labels,datasets,Object.assign({indexAxis:"y"},opts||{}));}
-function dlPNG(id){var c=CH[id];if(!c)return;var a=document.createElement("a");a.href=c.toBase64Image();a.download=id+".png";a.click();}
-function dlCSV(id){
-  var c=CH[id];if(!c)return;
-  var rows=[["Label"].concat(c.data.datasets.map(function(d){return d.label||"";}))];
-  c.data.labels.forEach(function(lbl,i){rows.push([lbl].concat(c.data.datasets.map(function(d){return d.data[i]||0;})));});
-  var a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(rows.map(function(r){return r.join(",");}).join("\n"));a.download=id+".csv";a.click();
+function fmtDateTime(d) {
+  var hh = String(d.getHours()).padStart(2, "0");
+  var mi = String(d.getMinutes()).padStart(2, "0");
+  return fmtDate(d) + " " + hh + ":" + mi;
 }
-function showTab(id,btn){
-  document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("active");});
-  document.querySelectorAll("nav button").forEach(function(b){b.classList.remove("active");});
-  document.getElementById("tab-"+id).classList.add("active");
-  if(btn)btn.classList.add("active");
+function seeded(i, lo, hi) {
+  var x = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
+  var frac = x - Math.floor(x);
+  return Math.round((lo + frac * (hi - lo)) * 10) / 10;
+}
+function filterScale() {
+  var s = 1.0;
+  if (GF.highway === "Munyonyo Spur") s *= 0.42;
+  if (GF.dir) s *= 0.52;
+  if (GF.stn) s *= 0.36;
+  if (GF.fy === "Vision 2040") s *= 1.55;
+  return s;
+}
+function visionFactor(yr) {
+  return Math.pow(1.032, yr - 2026);
+}
+
+function mkChart(id, type, labels, datasets, opts) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  if (CH[id]) CH[id].destroy();
+  var baseOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {labels: {color: "#0F172A", font: {size: 11, family: "Arial"}}}
+    },
+    scales: {
+      x: {ticks: {color: "#475569", font: {family: "Arial"}}, grid: {color: "#E2E8F0"}},
+      y: {ticks: {color: "#475569", font: {family: "Arial"}}, grid: {color: "#E2E8F0"}}
+    }
+  };
+  if (opts && opts.plugins && opts.plugins.legend) {
+    baseOpts.plugins.legend = Object.assign({}, baseOpts.plugins.legend, opts.plugins.legend);
+  }
+  if (opts && opts.scales) {
+    baseOpts.scales = Object.assign({}, baseOpts.scales, opts.scales);
+  }
+  if (opts && opts.indexAxis) {
+    baseOpts.indexAxis = opts.indexAxis;
+  }
+  CH[id] = new Chart(el.getContext("2d"), {
+    type: type,
+    data: {labels: labels, datasets: datasets},
+    options: baseOpts
+  });
+}
+
+function mkDoughnut(id, labels, data, colors) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  if (CH[id]) CH[id].destroy();
+  CH[id] = new Chart(el.getContext("2d"), {
+    type: "doughnut",
+    data: {labels: labels, datasets: [{data: data, backgroundColor: colors, borderColor: "#FFFFFF", borderWidth: 2}]},
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {legend: {position: "right", labels: {color: "#0F172A", font: {size: 11, family: "Arial"}}}}
+    }
+  });
+}
+
+function dlPNG(id) {
+  var c = CH[id];
+  if (!c) return;
+  var a = document.createElement("a");
+  a.href = c.toBase64Image();
+  a.download = id + ".png";
+  a.click();
+}
+function dlCSV(id) {
+  var c = CH[id];
+  if (!c) return;
+  var rows = [["Label"].concat(c.data.datasets.map(function(d) {return d.label || "";}))];
+  c.data.labels.forEach(function(lbl, i) {
+    rows.push([lbl].concat(c.data.datasets.map(function(d) {return d.data[i] || 0;})));
+  });
+  var a = document.createElement("a");
+  a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(rows.map(function(r) {return r.join(",");}).join("\n"));
+  a.download = id + ".csv";
+  a.click();
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll(".tab").forEach(function(t) {t.classList.remove("active");});
+  document.querySelectorAll("nav button").forEach(function(b) {
+    b.classList.remove("active");
+    b.setAttribute("aria-selected", "false");
+  });
+  document.getElementById("tab-" + id).classList.add("active");
+  if (btn) {
+    btn.classList.add("active");
+    btn.setAttribute("aria-selected", "true");
+  }
   loadActiveTab();
 }
-var GF={highway:"",dir:"",fy:"",stn:""};
-function applyGF(){GF.highway=document.getElementById("gf-highway").value;GF.dir=document.getElementById("gf-dir").value;GF.fy=document.getElementById("gf-fy").value;GF.stn=document.getElementById("gf-stn").value;loadActiveTab();}
-function resetGF(){["gf-highway","gf-dir","gf-fy","gf-stn"].forEach(function(id){document.getElementById(id).value="";});GF={highway:"",dir:"",fy:"",stn:""};loadActiveTab();}
-function loadActiveTab(){var id=document.querySelector(".tab.active").id.replace("tab-","");({its:loadITS,incidents:loadIncidents,vms:loadVMS,enforce:loadEnforce,toll:loadToll,admin:loadAdm})[id]();}
 
-function rnd(lo,hi){return Math.round((lo+Math.random()*(hi-lo))*10)/10;}
-function rndArr(n,lo,hi){var a=[];for(var i=0;i<n;i++)a.push(rnd(lo,hi));return a;}
-function rndTrend(n,start,g){var a=[start];for(var i=1;i<n;i++)a.push(Math.round(a[i-1]*(1+g*(0.8+Math.random()*.4))*10)/10);return a;}
-
-var COL=["#2563eb","#278a50","#b77900","#c75a24","#b83d6b","#7258b7","#3f76c5"];
-
-// ── ITS Overview ──────────────────────────────────────────────────────────────
-function loadITS(){
-  Promise.all([getOpts("kee","fiscal_year"),getOpts("kee","vehicle_class"),getOpts("kee","highway")]).then(function(res){
-    var fys=res[0].length?res[0].map(function(f){return f.label||f.value;}):["FY2019/20","FY2020/21","FY2021/22","FY2022/23","FY2023/24","FY2024/25","FY2025/26"];
-    var vclasses=res[1].length?res[1].map(function(v){return v.label||v.value;}):cfgArr("kee.vehicle_classes","Motorcycles,Cars/Taxis,Minibuses,Buses,Light Trucks,Heavy Trucks,Trailers".split(","));
-    document.getElementById("kv-aadt").textContent=cfgI("kee.aadt",24380).toLocaleString();
-    document.getElementById("kd-aadt").textContent="▲ "+cfgF("kee.aadt_growth",3.2).toFixed(1)+"% YoY";document.getElementById("kd-aadt").className="delta up";
-    document.getElementById("kv-inc").textContent=cfgI("kee.active_incidents",7);document.getElementById("kd-inc").textContent="▼ "+cfgI("kee.inc_delta",3)+" from yesterday";
-    document.getElementById("kv-vms").textContent=cfgI("kee.vms_online",18)+"/"+cfgI("kee.vms_total",20);
-    var vr=cfgI("kee.vms_online",18)/cfgI("kee.vms_total",20)*100;document.getElementById("kd-vms").textContent=(vr>=cfgF("kee.vms_target",90)?"▲ On target":"▼ Below target");document.getElementById("kd-vms").className="delta "+(vr>=cfgF("kee.vms_target",90)?"up":"dn");
-    document.getElementById("kv-toll").textContent="UGX "+(cfgF("kee.toll_today",82.4)/1000).toFixed(1)+"M";document.getElementById("kd-toll").textContent="▲ vs yesterday";
-    document.getElementById("kv-speed").textContent=cfgI("kee.avg_speed",78)+" km/h";
-    // Volume stacked by vehicle class
-    mkChart("ch-vol-stk","bar",fys,vclasses.slice(0,5).map(function(v,i){return {label:v,data:rndTrend(fys.length,rnd(2000,8000),cfgF("kee.vol_growth",0.04)),backgroundColor:COL[i],stack:"s"};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
-    // Volume clustered by direction
-    var dirs=cfgArr("kee.directions","Northbound,Southbound".split(","));
-    mkChart("ch-vol-clu","bar",fys,dirs.map(function(d,i){return {label:d,data:rndTrend(fys.length,rnd(8000,15000),cfgF("kee.vol_growth",0.04)),backgroundColor:COL[i]};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
-    // Hourly distribution
-    var hrs=[];for(var h=0;h<24;h++)hrs.push(h+":00");
-    mkChart("ch-hourly","line",hrs,[{label:"Traffic Volume",data:hrs.map(function(h,i){var peak=(i>=7&&i<=9)||(i>=17&&i<=19);return Math.round((peak?rnd(1500,2500):rnd(200,800))*10)/10;
-    }),borderColor:"#2563eb",fill:true,backgroundColor:"rgba(0,245,255,.07)",tension:.4}],{plugins:{legend:{display:false}}});
-    // Vehicle class mix
-    mkDoughnut("ch-class",vclasses,rndArr(vclasses.length,5,35),COL);
-  });
+function applyGF() {
+  GF.highway = document.getElementById("gf-highway").value;
+  GF.dir = document.getElementById("gf-dir").value;
+  GF.fy = document.getElementById("gf-fy").value;
+  GF.stn = document.getElementById("gf-stn").value;
+  loadActiveTab();
+}
+function resetGF() {
+  ["gf-highway", "gf-dir", "gf-fy", "gf-stn"].forEach(function(id) {document.getElementById(id).value = "";});
+  GF = {highway: "", dir: "", fy: "", stn: ""};
+  loadActiveTab();
 }
 
-// ── Incident Management ───────────────────────────────────────────────────────
-var INC_ALL=[],INC_PG={cur:0,sz:15};
-function loadIncidents(){
-  getOpts("kee","incident_type").then(function(types){
-    var iTypes=types.length?types.map(function(t){return t.label||t.value;}):cfgArr("kee.incident_types","Accident,Breakdown,Obstruction,Flooding,Rockfall,Animal on Road".split(","));
-    var months=[];for(var i=11;i>=0;i--){var d=new Date();d.setMonth(d.getMonth()-i);months.push(d.toLocaleString("default",{month:"short",year:"2-digit"}));}
-    document.getElementById("kpis-inc").innerHTML="<div class='kpi'><div class='val' style='color:var(--p)'>"+cfgI("kee.incidents_mtd",47)+"</div><div class='lbl'>Incidents MTD</div></div><div class='kpi'><div class='val' style='color:var(--y)'>"+cfgF("kee.avg_clearance",18.4).toFixed(1)+" min</div><div class='lbl'>Avg Clearance Time</div></div><div class='kpi'><div class='val' style='color:var(--g)'>"+cfgF("kee.resp_rate",94.2).toFixed(1)+"%</div><div class='lbl'>Response Rate</div></div>";
-    mkChart("ch-inc-stk","bar",months,iTypes.slice(0,4).map(function(t,i){return {label:t,data:rndArr(12,2,20),backgroundColor:COL[i],stack:"s"};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
-    mkChart("ch-inc-sev","bar",months,[
-      {label:"Minor",data:rndArr(12,5,20),backgroundColor:"#278a50"},{label:"Moderate",data:rndArr(12,2,12),backgroundColor:"#b77900"},{label:"Severe",data:rndArr(12,0,6),backgroundColor:"#b83d6b"}
-    ],{plugins:{legend:{labels:{color:"#4b5563"}}}});
-    var respBins=cfgArr("kee.resp_bins","<5,5-10,10-20,20-30,>30".split(","));
-    mkChart("ch-resp","bar",respBins,[{label:"Incidents",data:rndArr(5,5,80),backgroundColor:["#278a50","#2563eb","#b77900","#c75a24","#b83d6b"]}],{plugins:{legend:{display:false}}});
-    var locs=cfgArr("kee.hotspots","Km 12,Km 28,Km 45,Km 67,Km 89,Km 103,Km 128".split(","));
-    mkHBar("ch-hotspot",locs,[{label:"Incidents",data:rndArr(locs.length,5,60),backgroundColor:"#b83d6b"}]);
-    // Incident log
-    INC_ALL=[];
-    var types2=["Accident","Breakdown","Obstruction","Flooding","Animal on Road","Rockfall"];
-    var locs2=["Km 12+300","Km 28+100","Km 45+800","Km 67+200","Km 89+500","Km 103+000","Km 128+400"];
-    var sevs=["Minor","Moderate","Severe"];var sts=["Active","Cleared","Under Review"];
-    for(var i=0;i<80;i++){
-      var sev=sevs[i%3];var st=i<7?"Active":"Cleared";
-      INC_ALL.push({id:"INC-"+(1000+i),time:new Date(Date.now()-i*3600000).toLocaleString(),location:locs2[i%locs2.length],type:types2[i%types2.length],severity:sev,status:st,resp:Math.floor(rnd(5,35))});
-    }
-    renderIncTbl();
-  });
-}
-function renderIncTbl(){
-  var tbody=document.getElementById("inc-tbody");
-  var s=INC_PG.cur*INC_PG.sz;var page=INC_ALL.slice(s,s+INC_PG.sz);
-  tbody.innerHTML=page.map(function(inc){
-    var sc=inc.severity==="Minor"?"badge-good":inc.severity==="Moderate"?"badge-warn":"badge-bad";
-    var oc=inc.status==="Active"?"badge-bad":inc.status==="Cleared"?"badge-good":"badge-info";
-    return "<tr><td>"+inc.id+"</td><td>"+inc.time+"</td><td>"+inc.location+"</td><td>"+inc.type+"</td><td><span class='badge "+sc+"'>"+inc.severity+"</span></td><td><span class='badge "+oc+"'>"+inc.status+"</span></td><td>"+inc.resp+"</td></tr>";
-  }).join("");
-  var total=Math.ceil(INC_ALL.length/INC_PG.sz);
-  document.getElementById("inc-pg").innerHTML="<span>Page "+(INC_PG.cur+1)+" of "+total+"</span>"+(INC_PG.cur>0?"<button onclick='pgInc(-1)'>← Prev</button>":"")+(INC_PG.cur<total-1?"<button onclick='pgInc(1)'>Next →</button>":"");
-}
-function pgInc(d){INC_PG.cur+=d;renderIncTbl();}
-
-// ── VMS Boards ────────────────────────────────────────────────────────────────
-var VMS_DATA=[];
-function loadVMS(){
-  sbFetch("kee_vms?select=*&limit=50").then(function(rows){
-    if(!Array.isArray(rows)||!rows.length){rows=genVMS();}
-    VMS_DATA=rows;renderVMS();
-  }).catch(function(){VMS_DATA=genVMS();renderVMS();});
-  document.getElementById("kpis-vms").innerHTML="<div class='kpi'><div class='val' style='color:var(--g)'>"+cfgI("kee.vms_online",18)+"</div><div class='lbl'>Online</div></div><div class='kpi'><div class='val' style='color:var(--p)'>"+cfgI("kee.vms_offline",2)+"</div><div class='lbl'>Offline</div></div><div class='kpi'><div class='val' style='color:var(--y)'>"+cfgI("kee.vms_warn",0)+"</div><div class='lbl'>Warning</div></div>";
-  var months=[];for(var i=5;i>=0;i--){var d=new Date();d.setMonth(d.getMonth()-i);months.push(d.toLocaleString("default",{month:"short"}));}
-  mkChart("ch-vms-up","line",months,[{label:"Uptime %",data:rndArr(6,92,99.8),borderColor:"#278a50",tension:.4,fill:false}],{scales:{y:{min:80,max:100}},plugins:{legend:{display:false}}});
-  getOpts("kee","vms_category").then(function(cats){
-    var catLbls=cats.length?cats.map(function(c){return c.label||c.value;}):["Traffic Advisory","Weather Warning","Speed Limit","Incident Alert","Lane Closure","General Info"];
-    mkDoughnut("ch-vms-cat",catLbls,rndArr(catLbls.length,10,80),COL);
-  });
-}
-function genVMS(){
-  var v=[];var msgs=["ACCIDENT AHEAD — SLOW DOWN","ROAD WORKS NEXT 2KM","MAX SPEED 80 KM/H","HEAVY RAIN — CAUTION","LANE CLOSED — MERGE LEFT","CLEAR ROAD AHEAD","FOG WARNING — LIGHTS ON","WEIGHT CHECK AHEAD"];
-  var locs=cfgArr("kee.vms_locations","Km 5,Km 12,Km 18,Km 28,Km 35,Km 45,Km 58,Km 67,Km 78,Km 89,Km 98,Km 103,Km 115,Km 128,Km 140,Km 156,Km 168,Km 180,Km 195,Km 210".split(","));
-  var stats=["online","online","online","online","online","online","online","online","online","offline","warning","online","online","online","online","online","online","online","online","offline"];
-  for(var i=0;i<20;i++){v.push({id:"VMS-"+(101+i),location:locs[i]||("Km "+(i*10+5)),message:msgs[i%msgs.length],status:stats[i],last_update:new Date(Date.now()-Math.floor(Math.random()*3600000)).toLocaleString()});}
-  return v;
-}
-function renderVMS(){
-  var f=document.getElementById("vms-filter").value;
-  var grid=document.getElementById("vms-grid");
-  var filt=VMS_DATA.filter(function(v){return !f||v.status===f;});
-  grid.innerHTML=filt.map(function(v){
-    var sc=v.status==="online"?"s-on":v.status==="offline"?"s-off":"s-warn";
-    return "<div class='vms-card'><div class='vms-id'>"+v.id+"</div><div class='vms-loc'>"+v.location+"</div><div class='vms-msg'>"+v.message+"</div><div class='vms-status'><span class='status-dot "+sc+"'></span>"+v.status.toUpperCase()+"<span style='float:right;font-size:10px;color:#555;'>"+v.last_update+"</span></div></div>";
-  }).join("");
-}
-function dlVMSCSV(){
-  var csv=["ID,Location,Message,Status,Last Update"].concat(VMS_DATA.map(function(v){return [v.id,v.location,'"'+v.message+'"',v.status,v.last_update].join(",");})).join("\n");
-  var a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);a.download="vms_boards.csv";a.click();
+function updateVisionYear(val) {
+  VISION_YEAR = parseInt(val, 10);
+  document.getElementById("vision-year-badge").textContent = "Year: " + VISION_YEAR;
+  var note = VISION_YEAR <= 2025 ? "Historic Baseline" : (VISION_YEAR === 2026 ? "Current Baseline (FY 2025/26)" : "Vision 2040 Projection (+3.2% annual growth)");
+  document.getElementById("vision-note").textContent = note + " | Authoritative National Network: 21,284.02 km";
+  loadITS();
 }
 
-// ── Enforcement ───────────────────────────────────────────────────────────────
-function loadEnforce(){
-  Promise.all([getOpts("kee","violation_type"),getOpts("kee","enforcement_station")]).then(function(res){
-    var vtypes=res[0].length?res[0].map(function(v){return v.label||v.value;}):cfgArr("kee.violation_types","Speeding,Overloading,No Seatbelt,Wrong Lane,Using Phone,No Helmet,Overloading Axle".split(","));
-    var stns=res[1].length?res[1].map(function(s){return s.label||s.value;}):cfgArr("kee.enf_stations","Namanve,Lugazi,Jinja,Iganga,Budaka".split(","));
-    document.getElementById("kpis-enf").innerHTML="<div class='kpi'><div class='val'>"+cfgI("kee.violations_mtd",1842).toLocaleString()+"</div><div class='lbl'>Violations MTD</div></div><div class='kpi'><div class='val' style='color:var(--g)'>UGX "+cfgF("kee.fines_mtd",184.2).toFixed(1)+"M</div><div class='lbl'>Fines Collected MTD</div></div><div class='kpi'><div class='val' style='color:var(--y)'>"+cfgF("kee.collection_rate",78.4).toFixed(1)+"%</div><div class='lbl'>Collection Rate</div></div>";
-    var months=[];for(var i=11;i>=0;i--){var d=new Date();d.setMonth(d.getMonth()-i);months.push(d.toLocaleString("default",{month:"short",year:"2-digit"}));}
-    mkChart("ch-viol-stk","bar",months,vtypes.slice(0,4).map(function(v,i){return {label:v,data:rndArr(12,20,200),backgroundColor:COL[i],stack:"s"};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
-    mkChart("ch-viol-stn","bar",months,stns.slice(0,3).map(function(s,i){return {label:s,data:rndArr(12,50,300),backgroundColor:COL[i]};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
-    mkChart("ch-fines","line",months,[{label:"UGX (Millions)",data:rndTrend(12,cfgF("kee.fines_start",120),cfgF("kee.fines_growth",0.03)),borderColor:"#278a50",fill:true,backgroundColor:"rgba(0,255,136,.07)",tension:.4}],{plugins:{legend:{display:false}}});
-    mkDoughnut("ch-viol-type",vtypes,rndArr(vtypes.length,50,400),COL);
-    var tbody=document.getElementById("enf-tbody");
-    var rows=[];
-    for(var i=0;i<20;i++){rows.push("<tr><td>"+new Date(Date.now()-i*86400000).toLocaleDateString()+"</td><td>"+stns[i%stns.length]+"</td><td>"+vtypes[i%vtypes.length]+"</td><td>"+Math.floor(rnd(50000,500000)).toLocaleString()+"</td><td><span class='badge "+(i%3===0?"badge-warn":"badge-good")+"'>"+(i%3===0?"Pending":"Paid")+"</span></td></tr>");}
-    tbody.innerHTML=rows.join("");
-  });
+function loadActiveTab() {
+  var id = document.querySelector(".tab.active").id.replace("tab-", "");
+  var mapFn = {its: loadITS, map: initMap, incidents: loadIncidents, vms: loadVMS, enforce: loadEnforce, toll: loadToll, mindmap: renderMindMap, docs: function(){}};
+  if (mapFn[id]) mapFn[id]();
 }
 
-// ── Toll Revenue ──────────────────────────────────────────────────────────────
-function loadToll(){
-  Promise.all([getOpts("kee","fiscal_year"),getOpts("kee","toll_plaza"),getOpts("kee","vehicle_class")]).then(function(res){
-    var fys=res[0].length?res[0].map(function(f){return f.label||f.value;}):["FY2019/20","FY2020/21","FY2021/22","FY2022/23","FY2023/24","FY2024/25","FY2025/26"];
-    var plazas=res[1].length?res[1].map(function(p){return p.label||p.value;}):cfgArr("kee.toll_plazas","Namanve,Lugazi,Jinja,Iganga".split(","));
-    var vcls=res[2].length?res[2].map(function(v){return v.label||v.value;}):["Class 1","Class 2","Class 3","Class 4"];
-    document.getElementById("kpis-toll").innerHTML="<div class='kpi'><div class='val' style='color:var(--g)'>UGX "+cfgF("kee.toll_ytd",8.4).toFixed(1)+"Bn</div><div class='lbl'>Revenue YTD</div></div><div class='kpi'><div class='val'>"+cfgI("kee.txn_today",28400).toLocaleString()+"</div><div class='lbl'>Transactions Today</div></div><div class='kpi'><div class='val' style='color:var(--c)'>"+cfgI("kee.etoll_pct",34)+"%</div><div class='lbl'>e-Toll Share</div></div>";
-    mkChart("ch-toll-stk","bar",fys,plazas.map(function(p,i){return {label:p,data:rndTrend(fys.length,rnd(0.5,2),cfgF("kee.toll_growth",0.08)),backgroundColor:COL[i],stack:"s"};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
-    mkChart("ch-toll-clu","bar",fys,vcls.map(function(v,i){return {label:v,data:rndTrend(fys.length,rnd(0.2,1.5),cfgF("kee.toll_growth",0.08)),backgroundColor:COL[i]};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
-    var days=[];for(var i=29;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);days.push(d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"}));}
-    mkChart("ch-toll-daily","line",days,[{label:"Revenue (UGX M)",data:rndArr(30,60,120),borderColor:"#b77900",fill:true,backgroundColor:"rgba(255,238,0,.05)",tension:.4}],{plugins:{legend:{display:false}}});
-    var hrs=[];for(var h=0;h<24;h++)hrs.push(h+":00");
-    mkChart("ch-toll-hr","bar",hrs,[{label:"Transactions",data:hrs.map(function(_,i){return Math.round(rnd(i>=6&&i<=8||i>=17&&i<=19?800:100,i>=6&&i<=8||i>=17&&i<=19?2000:500));
-    }),backgroundColor:"#2563eb"}],{plugins:{legend:{display:false}}});
-    // Lane status
-    var lanesEl=document.getElementById("toll-lanes");
-    lanesEl.innerHTML=plazas.map(function(p){
-      var lanes=cfgI("kee.lanes_per_plaza",4);var html="<div style='margin-bottom:12px;'><div style='color:var(--c);font-size:12px;margin-bottom:6px;'>"+p+"</div>";
-      for(var i=0;i<lanes;i++){var open=Math.random()>.2;html+="<div class='toll-lane'><span>Lane "+(i+1)+" &nbsp;<span class='badge "+(open?"badge-good":"badge-bad")+"'>"+(open?"OPEN":"CLOSED")+"</span></span><span style='color:#666;font-size:11px;'>"+Math.floor(rnd(0,80))+" txn/hr</span></div>";}
-      return html+"</div>";
-    }).join("");
-  });
+// ── ITS Overview ──
+function loadITS() {
+  var sc = filterScale() * visionFactor(VISION_YEAR);
+  var aadt = Math.round(24380 * sc);
+  var tollDaily = (82.4 * sc).toFixed(1);
+  document.getElementById("kv-aadt").textContent = aadt.toLocaleString();
+  document.getElementById("kv-toll").textContent = "UGX " + tollDaily + "M";
+
+  var yrs = ["2016", "2020", "2024", "2026", "2030", "2035", "2040"];
+  var vclasses = ["Class 1 (Motorcycles)", "Class 2 (Saloon Cars)", "Class 3 (Light Goods)", "Class 4 (Medium Trucks)", "Class 5 (Heavy Trucks)"];
+  var baseVol = [1400, 9800, 4200, 2600, 1800];
+  mkChart("ch-vol-stk", "bar", yrs, vclasses.map(function(v, i) {
+    return {
+      label: v,
+      data: yrs.map(function(y) {return Math.round(baseVol[i] * filterScale() * Math.pow(1.032, parseInt(y, 10) - 2026));}),
+      backgroundColor: COL[i],
+      stack: "s"
+    };
+  }));
+
+  var dirs = ["Kampala to Entebbe", "Entebbe to Kampala"];
+  mkChart("ch-vol-clu", "bar", yrs, dirs.map(function(d, i) {
+    return {
+      label: d,
+      data: yrs.map(function(y) {return Math.round((11800 + i * 780) * filterScale() * Math.pow(1.032, parseInt(y, 10) - 2026));}),
+      backgroundColor: COL[i]
+    };
+  }));
+
+  var hrs = [];
+  for (var h = 0; h < 24; h++) hrs.push(String(h).padStart(2, "0") + ":00");
+  mkChart("ch-hourly", "line", hrs, [{
+    label: "Hourly Vehicles",
+    data: hrs.map(function(_, i) {
+      var peak = (i >= 7 && i <= 9) || (i >= 17 && i <= 19);
+      return Math.round((peak ? seeded(i + 1, 1650, 2350) : seeded(i + 1, 280, 760)) * filterScale() * visionFactor(VISION_YEAR));
+    }),
+    borderColor: "#0071E3",
+    backgroundColor: "rgba(0, 113, 227, 0.12)",
+    fill: true,
+    tension: 0.35
+  }], {plugins: {legend: {display: false}}});
+
+  mkDoughnut("ch-class", [
+    "Primary Roads (15,689.54 km)",
+    "National Trunk (2,845.27 km)",
+    "International Trunk (2,604.65 km)",
+    "Expressways (144.56 km)"
+  ], [15689.54, 2845.27, 2604.65, 144.56], ["#0071E3", "#16A34A", "#D97706", "#7C3AED"]);
 }
 
-// ── Administration ────────────────────────────────────────────────────────────
-function loadAdm(){
-  var sys=[{n:"ITS Control Center",s:"online",d:"All systems nominal"},{n:"CCTV Network",s:"online",d:cfgI("kee.cctv_online",42)+"/"+cfgI("kee.cctv_total",45)+" cameras live"},{n:"ATC Sensors",s:"online",d:cfgI("kee.atc_active",28)+"/"+cfgI("kee.atc_total",30)+" active"},{n:"VMS Controller",s:"online",d:"Firmware v3.2.1"},{n:"Toll Backend",s:"online",d:"Latency: "+Math.floor(rnd(5,20))+"ms"}];
-  document.getElementById("sys-health").innerHTML=sys.map(function(s){return "<div style='display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a1a;'><span><span class='status-dot s-on'></span>"+s.n+"</span><span style='color:#666;font-size:11px;'>"+s.d+"</span></div>";}).join("");
-  document.getElementById("kpis-adm").innerHTML="<div class='kpi'><div class='val'>"+cfgI("kee.devices_total",105)+"</div><div class='lbl'>ITS Devices</div></div><div class='kpi'><div class='val' style='color:var(--g)'>"+cfgF("kee.sys_uptime",99.2).toFixed(1)+"%</div><div class='lbl'>System Uptime</div></div><div class='kpi'><div class='val' style='color:var(--c)'>"+cfgI("kee.operators",8)+"</div><div class='lbl'>Active Operators</div></div>";
-  var months=[];for(var i=5;i>=0;i--){var d=new Date();d.setMonth(d.getMonth()-i);months.push(d.toLocaleString("default",{month:"short"}));}
-  var devices=cfgArr("kee.device_types","VMS,CCTV,ATC,Toll,ANPR".split(","));
-  mkChart("ch-adm-up","line",months,devices.map(function(d,i){return {label:d,data:rndArr(6,94,99.9),borderColor:COL[i],tension:.4,fill:false};}),{plugins:{legend:{labels:{color:"#4b5563"}}}});
-  var srcs=cfgArr("kee.data_sources","CCTV,ATC,VMS,Toll,ANPR,Weather".split(","));
-  mkChart("ch-sync","bar",srcs,[{label:"Sync %",data:rndArr(srcs.length,88,100),backgroundColor:srcs.map(function(_,i){return COL[i%COL.length];})}],{plugins:{legend:{display:false}},indexAxis:"y",scales:{x:{min:0,max:100}}});
-  var weeks=["W-5","W-4","W-3","W-2","W-1","This Week"];
-  mkChart("ch-alerts","bar",weeks,[{label:"Critical",data:rndArr(6,1,8),backgroundColor:"#b83d6b"},{label:"Warning",data:rndArr(6,5,20),backgroundColor:"#b77900"},{label:"Info",data:rndArr(6,10,40),backgroundColor:"#2563eb"}],{plugins:{legend:{labels:{color:"#4b5563"}}}});
+// ── Geospatial Map (Esri World Imagery + Hybrid Labels) ──
+var KEE_MAP = null;
+var MAP_LAYERS = {};
+var FLOW_TIMER = null;
+var FLOW_DOTS = [];
+function initMap() {
+  if (KEE_MAP) {
+    setTimeout(function() {KEE_MAP.invalidateSize();}, 120);
+    return;
+  }
+  KEE_MAP = L.map("kee-map", {center: [0.225, 32.515], zoom: 11});
+  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+    attribution: "Esri World Imagery",
+    maxZoom: 18
+  }).addTo(KEE_MAP);
+  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {
+    maxZoom: 18
+  }).addTo(KEE_MAP);
+  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}", {
+    maxZoom: 18
+  }).addTo(KEE_MAP);
+
+  var keeMain = [[0.3055, 32.5020], [0.2850, 32.5160], [0.2520, 32.5320], [0.2050, 32.5480], [0.1450, 32.5300], [0.0950, 32.4950], [0.0450, 32.4430]];
+  var munyonyoSpur = [[0.2050, 32.5480], [0.2180, 32.5750], [0.2360, 32.6120]];
+  var unpavedSample = [[0.2520, 32.5320], [0.2680, 32.4820], [0.2810, 32.4510]];
+
+  MAP_LAYERS.corridor = L.layerGroup([
+    L.polyline(keeMain, {color: "#0071E3", weight: 5, opacity: 0.92}).bindPopup("<strong>KEE Mainline (Paved Expressway)</strong><br>Busega to Entebbe Airport<br>Surveyed via ROMDAS(Roughness and rutting machine based testing)"),
+    L.polyline(munyonyoSpur, {color: "#0D9488", weight: 5, opacity: 0.92}).bindPopup("<strong>Munyonyo Spur (Paved Expressway)</strong><br>Kajjansi Interchange to Munyonyo"),
+    L.polyline(unpavedSample, {color: "#D97706", weight: 2.9, dashArray: "5, 6", opacity: 0.9}).bindPopup("<strong>Feeder Unpaved Road</strong><br>National Unpaved Extent: 14,877.33 km (0.58x dotted style)")
+  ]).addTo(KEE_MAP);
+
+  MAP_LAYERS.plazas = L.layerGroup([
+    L.circleMarker([0.3055, 32.5020], {radius: 8, color: "#FFFFFF", weight: 2, fillColor: "#16A34A", fillOpacity: 1}).bindPopup("<strong>Busega Toll Plaza &amp; Weighbridge</strong><br>Coordinates: 0.3055, 32.5020"),
+    L.circleMarker([0.2050, 32.5480], {radius: 8, color: "#FFFFFF", weight: 2, fillColor: "#16A34A", fillOpacity: 1}).bindPopup("<strong>Kajjansi Toll Plaza &amp; Weighbridge</strong><br>Coordinates: 0.2050, 32.5480"),
+    L.circleMarker([0.0950, 32.4950], {radius: 8, color: "#FFFFFF", weight: 2, fillColor: "#16A34A", fillOpacity: 1}).bindPopup("<strong>Mpala Toll Plaza &amp; Weighbridge</strong><br>Coordinates: 0.0950, 32.4950")
+  ]).addTo(KEE_MAP);
+
+  MAP_LAYERS.vms = L.layerGroup([
+    L.circleMarker([0.2850, 32.5160], {radius: 6, color: "#FFFFFF", weight: 2, fillColor: "#7C3AED", fillOpacity: 1}).bindPopup("<strong>VMS-101</strong><br>Km 5 | Status: ONLINE"),
+    L.circleMarker([0.2320, 32.5390], {radius: 6, color: "#FFFFFF", weight: 2, fillColor: "#7C3AED", fillOpacity: 1}).bindPopup("<strong>VMS-104</strong><br>Km 14 | Status: ONLINE"),
+    L.circleMarker([0.1450, 32.5300], {radius: 6, color: "#FFFFFF", weight: 2, fillColor: "#7C3AED", fillOpacity: 1}).bindPopup("<strong>VMS-110</strong><br>Km 28 | Status: ONLINE"),
+    L.circleMarker([0.0620, 32.4610], {radius: 6, color: "#FFFFFF", weight: 2, fillColor: "#D97706", fillOpacity: 1}).bindPopup("<strong>VMS-116</strong><br>Km 41 | Status: WARNING")
+  ]).addTo(KEE_MAP);
+
+  MAP_LAYERS.bridges = L.layerGroup([
+    L.circleMarker([1.50021, 34.444229], {radius: 9, color: "#FFFFFF", weight: 2, fillColor: "#DC2626", fillOpacity: 1}).bindPopup("<strong>B162: Atari Bridge</strong><br>Road: Muyembe - Namalu (Eastern Region)<br>Condition: Poor (Critical Monitoring)<br>AADT: 1,443 | Coordinates: 1.50021, 34.44423"),
+    L.circleMarker([0.2140, 32.5510], {radius: 7, color: "#FFFFFF", weight: 2, fillColor: "#0071E3", fillOpacity: 1}).bindPopup("<strong>Nambigirwa Swamp Viaduct</strong><br>Condition: Good | National Bridges: 552")
+  ]).addTo(KEE_MAP);
+
+  MAP_LAYERS.flow = L.layerGroup().addTo(KEE_MAP);
+  for (var i = 0; i < 6; i++) {
+    var dot = L.circleMarker(keeMain[0], {radius: 4, color: "#FFFFFF", weight: 1, fillColor: "#0071E3", fillOpacity: 0.95}).addTo(MAP_LAYERS.flow);
+    FLOW_DOTS.push({marker: dot, t: i / 6});
+  }
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    FLOW_TIMER = setInterval(function() {
+      FLOW_DOTS.forEach(function(item) {
+        item.t = (item.t + 0.008) % 1;
+        var idx = item.t * (keeMain.length - 1);
+        var i0 = Math.floor(idx);
+        var i1 = Math.min(i0 + 1, keeMain.length - 1);
+        var f = idx - i0;
+        var lat = keeMain[i0][0] + (keeMain[i1][0] - keeMain[i0][0]) * f;
+        var lng = keeMain[i0][1] + (keeMain[i1][1] - keeMain[i0][1]) * f;
+        item.marker.setLatLng([lat, lng]);
+      });
+    }, 40);
+  }
 }
 
-// ── Filters ────────────────────────────────────────────────────────────────────
-function populateFilters(){
-  Promise.all([getOpts("kee","highway"),getOpts("kee","direction"),getOpts("kee","fiscal_year"),getOpts("kee","station")]).then(function(res){
-    [["gf-highway","All Highways"],["gf-dir","All Directions"],["gf-fy","All FYs"],["gf-stn","All Stations"]].forEach(function(pair,i){
-      var sel=document.getElementById(pair[0]);
-      sel.innerHTML='<option value="">'+pair[1]+'</option>';
-      (res[i]||[]).forEach(function(o){sel.innerHTML+='<option value="'+(o.value||o)+'">'+(o.label||o.value||o)+'</option>';});
+function toggleLayer(name, on) {
+  if (!KEE_MAP || !MAP_LAYERS[name]) return;
+  if (on) KEE_MAP.addLayer(MAP_LAYERS[name]);
+  else KEE_MAP.removeLayer(MAP_LAYERS[name]);
+}
+function zoomMap(target) {
+  if (!KEE_MAP) return;
+  if (target === "kee") KEE_MAP.setView([0.225, 32.515], 11);
+  else if (target === "b162") KEE_MAP.setView([1.50021, 34.444229], 13);
+  else KEE_MAP.setView([1.3733, 32.2903], 7);
+}
+
+// ── Incident Management ──
+var INC_ALL = [], INC_PG = {cur: 0, sz: 12};
+function loadIncidents() {
+  var sc = filterScale();
+  var months = ["Dec 25", "Jan 26", "Feb 26", "Mar 26", "Apr 26", "May 26", "Jun 26", "Jul 26", "Aug 26", "Sep 26", "Oct 26", "Nov 26"];
+  var iTypes = ["Breakdown", "Accident", "Obstruction", "Weather Event"];
+  document.getElementById("kpis-inc").innerHTML =
+    "<div class='kpi'><div class='val' style='color:#DC2626;'>" + Math.max(1, Math.round(47 * sc)) + "</div><div class='lbl'>Incidents MTD</div></div>" +
+    "<div class='kpi'><div class='val' style='color:#D97706;'>18.4 min</div><div class='lbl'>Average Clearance Time</div></div>" +
+    "<div class='kpi'><div class='val' style='color:#16A34A;'>94.2%</div><div class='lbl'>Response Rate</div></div>";
+
+  mkChart("ch-inc-stk", "bar", months, iTypes.map(function(t, i) {
+    return {label: t, data: months.map(function(_, m) {return Math.round(seeded(i * 12 + m + 1, 2, 18) * sc);}), backgroundColor: COL[i], stack: "s"};
+  }));
+  mkChart("ch-inc-sev", "bar", months, [
+    {label: "Minor", data: months.map(function(_, m) {return Math.round(seeded(m + 20, 6, 18) * sc);}), backgroundColor: "#16A34A"},
+    {label: "Moderate", data: months.map(function(_, m) {return Math.round(seeded(m + 40, 2, 11) * sc);}), backgroundColor: "#D97706"},
+    {label: "Severe", data: months.map(function(_, m) {return Math.round(seeded(m + 60, 0, 5) * sc);}), backgroundColor: "#DC2626"}
+  ]);
+  mkChart("ch-resp", "bar", ["<5 min", "5 to 10", "10 to 20", "20 to 30", ">30 min"], [{
+    label: "Incidents",
+    data: [24, 46, 32, 12, 5].map(function(v) {return Math.round(v * sc);}),
+    backgroundColor: ["#16A34A", "#0071E3", "#D97706", "#7C3AED", "#DC2626"]
+  }], {plugins: {legend: {display: false}}});
+  mkChart("ch-hotspot", "bar", ["Km 5 Busega", "Km 12", "Km 18 Kajjansi", "Km 28", "Km 35 Mpala", "Km 42"], [{
+    label: "Incidents",
+    data: [34, 28, 41, 19, 25, 16].map(function(v) {return Math.round(v * sc);}),
+    backgroundColor: "#DC2626"
+  }], {indexAxis: "y", plugins: {legend: {display: false}}});
+
+  INC_ALL = [];
+  var locs = ["Km 5+200 Busega", "Km 12+300", "Km 18+100 Kajjansi", "Km 28+400", "Km 35+000 Mpala", "Km 42+600"];
+  var sevs = ["Minor", "Moderate", "Severe"];
+  for (var i = 0; i < 48; i++) {
+    var dt = new Date(2026, 10, 19, 10 - (i % 10), (i * 11) % 60);
+    dt.setDate(dt.getDate() - Math.floor(i / 3));
+    INC_ALL.push({
+      id: "INC-" + (1001 + i),
+      time: fmtDateTime(dt),
+      location: locs[i % locs.length],
+      type: iTypes[i % iTypes.length],
+      severity: sevs[i % sevs.length],
+      status: i < 5 ? "Active" : "Cleared",
+      resp: Math.round(seeded(i + 5, 6, 29))
     });
-  });
+  }
+  INC_PG.cur = 0;
+  renderIncTbl();
 }
-loadConfig().then(function(){populateFilters();loadITS();});
+
+function renderIncTbl() {
+  var tbody = document.getElementById("inc-tbody");
+  var s = INC_PG.cur * INC_PG.sz;
+  var page = INC_ALL.slice(s, s + INC_PG.sz);
+  tbody.innerHTML = page.map(function(inc) {
+    var sc = inc.severity === "Minor" ? "badge-good" : inc.severity === "Moderate" ? "badge-warn" : "badge-bad";
+    var oc = inc.status === "Active" ? "badge-bad" : "badge-good";
+    return "<tr><td>" + inc.id + "</td><td>" + inc.time + "</td><td>" + inc.location + "</td><td>" + inc.type + "</td><td><span class='badge " + sc + "'>" + inc.severity + "</span></td><td><span class='badge " + oc + "'>" + inc.status + "</span></td><td>" + inc.resp + "</td></tr>";
+  }).join("");
+  var total = Math.ceil(INC_ALL.length / INC_PG.sz);
+  document.getElementById("inc-pg").innerHTML = "<span>Page " + (INC_PG.cur + 1) + " of " + total + "</span>" +
+    (INC_PG.cur > 0 ? "<button type='button' onclick='pgInc(-1)'>Previous</button>" : "") +
+    (INC_PG.cur < total - 1 ? "<button type='button' onclick='pgInc(1)'>Next</button>" : "");
+}
+function pgInc(d) {INC_PG.cur += d; renderIncTbl();}
+
+// ── VMS Boards ──
+var VMS_DATA = [];
+function loadVMS() {
+  var msgs = ["ACCIDENT AHEAD: SLOW DOWN", "ROAD WORKS NEXT 2 KM", "MAX SPEED 80 KM/H", "HEAVY RAIN: DRIVE WITH CARE", "LANE CLOSED: MERGE LEFT", "CLEAR EXPRESSWAY AHEAD", "FOG WARNING: LIGHTS ON", "WEIGHBRIDGE CHECK AHEAD"];
+  var locs = ["Km 3 Busega", "Km 6", "Km 9", "Km 12", "Km 15", "Km 18 Kajjansi", "Km 21", "Km 24", "Km 27", "Km 30", "Km 33", "Km 35 Mpala", "Km 38", "Km 41", "Km 44", "Km 47", "Km 50", "Spur Km 2", "Spur Km 6", "Spur Km 11"];
+  var stats = ["online","online","online","online","online","online","online","online","online","offline","warning","online","online","online","online","online","online","online","online","offline"];
+  VMS_DATA = [];
+  for (var i = 0; i < 20; i++) {
+    var dt = new Date(2026, 10, 19, 9, (i * 3) % 60);
+    VMS_DATA.push({id: "VMS-" + (101 + i), location: locs[i], message: msgs[i % msgs.length], status: stats[i], last_update: fmtDateTime(dt)});
+  }
+  document.getElementById("kpis-vms").innerHTML =
+    "<div class='kpi'><div class='val' style='color:#16A34A;'>18</div><div class='lbl'>Online</div></div>" +
+    "<div class='kpi'><div class='val' style='color:#DC2626;'>2</div><div class='lbl'>Offline</div></div>" +
+    "<div class='kpi'><div class='val' style='color:#D97706;'>1</div><div class='lbl'>Warning</div></div>";
+  renderVMS();
+  mkChart("ch-vms-up", "line", ["Jun 26", "Jul 26", "Aug 26", "Sep 26", "Oct 26", "Nov 26"], [{
+    label: "Uptime %", data: [95.2, 96.4, 97.1, 96.8, 98.2, 98.5], borderColor: "#16A34A", tension: 0.35, fill: false
+  }], {scales: {y: {min: 85, max: 100}}, plugins: {legend: {display: false}}});
+  mkDoughnut("ch-vms-cat", ["Warning", "Speed Limit", "Toll Tariff", "Public Notice"], [42, 68, 35, 55], ["#D97706", "#0071E3", "#16A34A", "#7C3AED"]);
+}
+function renderVMS() {
+  var f = document.getElementById("vms-filter").value;
+  var filt = VMS_DATA.filter(function(v) {return !f || v.status === f;});
+  document.getElementById("vms-grid").innerHTML = filt.map(function(v) {
+    var sc = v.status === "online" ? "s-on" : v.status === "offline" ? "s-off" : "s-warn";
+    return "<div class='vms-card'><div class='vms-id'>" + v.id + "</div><div class='vms-loc'>" + v.location + "</div><div class='vms-msg'>" + v.message + "</div><div class='vms-status'><span><span class='status-dot " + sc + "'></span>" + v.status.toUpperCase() + "</span><span style='font-size:10px;color:#475569;'>" + v.last_update + "</span></div></div>";
+  }).join("");
+}
+function dlVMSCSV() {
+  var csv = ["ID,Location,Message,Status,Last Update (dd/mm/yyyy)"].concat(VMS_DATA.map(function(v) {
+    return [v.id, v.location, '"' + v.message + '"', v.status, v.last_update].join(",");
+  })).join("\n");
+  var a = document.createElement("a");
+  a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+  a.download = "vms_boards.csv";
+  a.click();
+}
+
+// ── Enforcement ──
+function loadEnforce() {
+  var sc = filterScale();
+  var vtypes = ["Overload", "Speeding", "Toll Evasion"];
+  var stns = ["Busega Weighbridge", "Kajjansi Weighbridge", "Mpala Weighbridge"];
+  var months = ["Dec 25", "Jan 26", "Feb 26", "Mar 26", "Apr 26", "May 26", "Jun 26", "Jul 26", "Aug 26", "Sep 26", "Oct 26", "Nov 26"];
+  document.getElementById("kpis-enf").innerHTML =
+    "<div class='kpi'><div class='val'>" + Math.round(1842 * sc).toLocaleString() + "</div><div class='lbl'>Violations MTD</div></div>" +
+    "<div class='kpi'><div class='val' style='color:#16A34A;'>UGX " + (184.2 * sc).toFixed(1) + "M</div><div class='lbl'>Fines Collected MTD</div></div>" +
+    "<div class='kpi'><div class='val' style='color:#D97706;'>78.4%</div><div class='lbl'>Collection Rate</div></div>";
+
+  mkChart("ch-viol-stk", "bar", months, vtypes.map(function(v, i) {
+    return {label: v, data: months.map(function(_, m) {return Math.round(seeded(i * 12 + m + 3, 25, 160) * sc);}), backgroundColor: COL[i], stack: "s"};
+  }));
+  mkChart("ch-viol-stn", "bar", months, stns.map(function(s, i) {
+    return {label: s, data: months.map(function(_, m) {return Math.round(seeded(i * 15 + m + 7, 45, 220) * sc);}), backgroundColor: COL[i]};
+  }));
+  mkChart("ch-fines", "line", months, [{
+    label: "UGX Millions",
+    data: months.map(function(_, m) {return Math.round((120 + m * 5.2) * sc);}),
+    borderColor: "#16A34A",
+    backgroundColor: "rgba(22, 163, 74, 0.12)",
+    fill: true,
+    tension: 0.35
+  }], {plugins: {legend: {display: false}}});
+  mkDoughnut("ch-viol-type", vtypes, [410, 920, 512], ["#DC2626", "#0071E3", "#D97706"]);
+
+  var rows = [];
+  for (var i = 0; i < 15; i++) {
+    var dt = new Date(2026, 10, 19 - i);
+    rows.push("<tr><td>" + fmtDate(dt) + "</td><td>" + stns[i % stns.length] + "</td><td>" + vtypes[i % vtypes.length] + "</td><td>" + Math.round(seeded(i + 9, 80000, 450000)).toLocaleString() + "</td><td><span class='badge " + (i % 3 === 0 ? "badge-warn" : "badge-good") + "'>" + (i % 3 === 0 ? "Pending" : "Paid") + "</span></td></tr>");
+  }
+  document.getElementById("enf-tbody").innerHTML = rows.join("");
+}
+
+// ── Toll Revenue ──
+function loadToll() {
+  var sc = filterScale();
+  var yrs = ["FY 2021/22", "FY 2022/23", "FY 2023/24", "FY 2024/25", "FY 2025/26", "2030 (Proj)", "2040 (Proj)"];
+  var plazas = ["Busega Plaza", "Kajjansi Plaza", "Mpala Plaza"];
+  var vcls = ["Class 1", "Class 2", "Class 3", "Class 4"];
+  document.getElementById("kpis-toll").innerHTML =
+    "<div class='kpi'><div class='val' style='color:#16A34A;'>UGX " + (8.4 * sc).toFixed(1) + " Bn</div><div class='lbl'>Revenue YTD</div></div>" +
+    "<div class='kpi'><div class='val'>" + Math.round(28400 * sc).toLocaleString() + "</div><div class='lbl'>Transactions Today</div></div>" +
+    "<div class='kpi'><div class='val' style='color:#0071E3;'>34%</div><div class='lbl'>e-Toll Share</div></div>" +
+    "<div class='kpi'><div class='val' style='color:#7C3AED;'>UGX " + (14.6 * sc).toFixed(1) + " Bn</div><div class='lbl'>Vision 2040 Annual Projection</div></div>";
+
+  mkChart("ch-toll-stk", "bar", yrs, plazas.map(function(p, i) {
+    return {label: p, data: yrs.map(function(_, y) {return Math.round((1.6 + i * 0.5) * Math.pow(1.06, y) * 10 * sc) / 10;}), backgroundColor: COL[i], stack: "s"};
+  }));
+  mkChart("ch-toll-clu", "bar", yrs, vcls.map(function(v, i) {
+    return {label: v, data: yrs.map(function(_, y) {return Math.round((0.8 + i * 0.4) * Math.pow(1.05, y) * 10 * sc) / 10;}), backgroundColor: COL[i]};
+  }));
+
+  var days = [];
+  for (var i = 29; i >= 0; i--) {
+    var d = new Date(2026, 10, 19);
+    d.setDate(d.getDate() - i);
+    days.push(fmtDate(d).slice(0, 5));
+  }
+  mkChart("ch-toll-daily", "line", days, [{
+    label: "Revenue (UGX M)",
+    data: days.map(function(_, idx) {return Math.round(seeded(idx + 2, 68, 98) * sc);}),
+    borderColor: "#D97706",
+    backgroundColor: "rgba(217, 119, 6, 0.10)",
+    fill: true,
+    tension: 0.35
+  }], {plugins: {legend: {display: false}}});
+
+  var hrs = [];
+  for (var h = 0; h < 24; h++) hrs.push(String(h).padStart(2, "0") + ":00");
+  mkChart("ch-toll-hr", "bar", hrs, [{
+    label: "Transactions",
+    data: hrs.map(function(_, i) {
+      var peak = (i >= 6 && i <= 8) || (i >= 17 && i <= 19);
+      return Math.round((peak ? seeded(i + 10, 1200, 1950) : seeded(i + 10, 180, 520)) * sc);
+    }),
+    backgroundColor: "#0071E3"
+  }], {plugins: {legend: {display: false}}});
+
+  document.getElementById("toll-lanes").innerHTML = plazas.map(function(p, pi) {
+    var html = "<div style='margin-bottom:12px;'><div style='color:#0071E3;font-size:12px;font-weight:700;margin-bottom:6px;'>" + p + "</div>";
+    for (var i = 0; i < 4; i++) {
+      var open = !(pi === 2 && i === 3);
+      html += "<div class='toll-lane'><span>Lane " + (i + 1) + " &nbsp;<span class='badge " + (open ? "badge-good" : "badge-bad") + "'>" + (open ? "OPEN" : "CLOSED") + "</span></span><span style='color:#475569;font-size:11px;'>" + (open ? Math.round(seeded(pi * 4 + i + 1, 24, 72)) : 0) + " txn/hr</span></div>";
+    }
+    return html + "</div>";
+  }).join("");
+}
+
+// ── Interactive Mind Map ──
+var MM_FILTER = "all";
+var MM_ZOOM = 1;
+var MM_NODES = [
+  {id: "root", cat: "all", x: 60, y: 230, w: 190, h: 56, color: "#0071E3", title: "MoWT DNR Ecosystem", sub: "21,284.02 km National Roads", detail: "Ministry of Works and Transport, Department of National Roads. Oversees 21,284.02 km National Road Network, 552 bridges, and 452 major culverts."},
+  {id: "net", cat: "network", x: 320, y: 60, w: 200, h: 52, color: "#16A34A", title: "National Road Network", sub: "6,406.69 km Paved | 14,877.33 km Unpaved", detail: "Class A International Trunk: 2,604.65 km; Class B National Trunk: 2,845.27 km; Class C Primary: 15,689.54 km; Class M Expressways: 144.56 km."},
+  {id: "its", cat: "its", x: 320, y: 175, w: 200, h: 52, color: "#0071E3", title: "KEE ITS Corridor", sub: "Mainline & Munyonyo Spur", detail: "Kampala to Entebbe Expressway intelligent transport corridor with 20 VMS boards, 3 Toll Plazas (Busega, Kajjansi, Mpala), and continuous traffic telemetry."},
+  {id: "str", cat: "structures", x: 320, y: 295, w: 200, h: 52, color: "#DC2626", title: "Bridges & Major Culverts", sub: "552 Bridges | 452 Major Culverts", detail: "Bridges: Good 247, Satisfactory 71, Marginal 162, Poor 52, Critical 13, Under Construction 7. Major Culverts: Good 403, Satisfactory 39, Marginal 4, Poor 1, Critical 4, Under Construction 1."},
+  {id: "tools", cat: "tools", x: 320, y: 410, w: 200, h: 52, color: "#7C3AED", title: "Survey Tools & Vision 2040", sub: "MOBICAP & ROMDAS", detail: "Condition data collected via MOBICAP(Road condition assesment tool) and ROMDAS(Roughness and rutting machine based testing), projected to Vision 2040."},
+  {id: "net_paved", cat: "network", x: 610, y: 30, w: 210, h: 44, color: "#16A34A", title: "Paved Extent: 6,406.69 km", sub: "30.10% of National Network", detail: "Solid full-width cartographic rendering. Includes 144.56 km of Expressways."},
+  {id: "net_unpaved", cat: "network", x: 610, y: 90, w: 210, h: 44, color: "#D97706", title: "Unpaved Extent: 14,877.33 km", sub: "69.90% of National Network", detail: "Dotted 0.58x cartographic rendering matching functional road class."},
+  {id: "its_plaza", cat: "its", x: 610, y: 150, w: 210, h: 44, color: "#0D9488", title: "Toll Plazas & Weighbridges", sub: "Busega, Kajjansi, Mpala", detail: "UGX 8.4 Bn YTD revenue with 34% e-Toll adoption and automated axle load enforcement."},
+  {id: "its_vms", cat: "its", x: 610, y: 210, w: 210, h: 44, color: "#0071E3", title: "VMS & Incident Response", sub: "18/20 Online | 18.4 min clearance", detail: "Real-time variable message signs and rapid incident response along KEE."},
+  {id: "str_b162", cat: "structures", x: 610, y: 275, w: 210, h: 44, color: "#DC2626", title: "B162: Atari Bridge", sub: "Muyembe - Namalu | Poor", detail: "Bridge B162 (Atari Bridge) on Muyembe - Namalu (Eastern Region, Mbale Station), AADT 1,443, flagged for priority intervention."},
+  {id: "str_culv", cat: "structures", x: 610, y: 335, w: 210, h: 44, color: "#D97706", title: "452 Major Culverts", sub: "403 Good | 4 Critical", detail: "Tracked separately from bridges in all engineering registers and maintenance programmes."},
+  {id: "tools_v2040", cat: "tools", x: 610, y: 410, w: 210, h: 44, color: "#7C3AED", title: "Vision 2040 Projections", sub: "2016 to 2040 Demand Horizon", detail: "All traffic and toll revenue indicators scale cleanly to 2040 using observed growth factors."}
+];
+var MM_EDGES = [
+  ["root", "net"], ["root", "its"], ["root", "str"], ["root", "tools"],
+  ["net", "net_paved"], ["net", "net_unpaved"],
+  ["its", "its_plaza"], ["its", "its_vms"],
+  ["str", "str_b162"], ["str", "str_culv"],
+  ["tools", "tools_v2040"]
+];
+
+function filterMindMap(cat, btn) {
+  MM_FILTER = cat;
+  document.querySelectorAll(".mindmap-toolbar button").forEach(function(b) {b.classList.remove("active");});
+  if (btn) btn.classList.add("active");
+  renderMindMap();
+}
+function zoomMindMap(factor) {
+  MM_ZOOM = factor === 0 ? 1 : Math.min(1.6, Math.max(0.7, MM_ZOOM * factor));
+  renderMindMap();
+}
+function selectMMNode(id) {
+  var n = MM_NODES.find(function(x) {return x.id === id;});
+  if (!n) return;
+  document.getElementById("mm-detail-body").innerHTML =
+    "<div class='toll-lane'><strong>" + n.title + "</strong><span class='badge badge-info'>" + n.cat.toUpperCase() + "</span></div>" +
+    "<p style='font-size:12px;color:#0F172A;margin-top:8px;'><strong>Summary:</strong> " + n.sub + "</p>" +
+    "<p style='font-size:12px;color:#475569;margin-top:8px;'>" + n.detail + "</p>";
+}
+function renderMindMap() {
+  var svg = document.getElementById("mindmap-svg");
+  if (!svg) return;
+  var visNodes = MM_NODES.filter(function(n) {return MM_FILTER === "all" || n.id === "root" || n.cat === MM_FILTER;});
+  var visIds = {};
+  visNodes.forEach(function(n) {visIds[n.id] = n;});
+  var vw = Math.round(920 / MM_ZOOM), vh = Math.round(500 / MM_ZOOM);
+  svg.setAttribute("viewBox", "0 0 " + vw + " " + vh);
+
+  var paths = MM_EDGES.filter(function(e) {return visIds[e[0]] && visIds[e[1]];}).map(function(e) {
+    var a = visIds[e[0]], b = visIds[e[1]];
+    var x1 = a.x + a.w, y1 = a.y + a.h / 2, x2 = b.x, y2 = b.y + b.h / 2;
+    var cx = (x1 + x2) / 2;
+    return "<path d='M" + x1 + "," + y1 + " C" + cx + "," + y1 + " " + cx + "," + y2 + " " + x2 + "," + y2 + "' fill='none' stroke='#CBD5E1' stroke-width='2'/>";
+  }).join("");
+
+  var boxes = visNodes.map(function(n) {
+    return "<g class='mm-node' onclick=\"selectMMNode('" + n.id + "')\">" +
+      "<rect x='" + n.x + "' y='" + n.y + "' width='" + n.w + "' height='" + n.h + "' rx='10' fill='#FFFFFF' stroke='" + n.color + "' stroke-width='1.8'/>" +
+      "<text x='" + (n.x + 12) + "' y='" + (n.y + 20) + "' font-size='12' font-weight='700' fill='#0F172A'>" + n.title + "</text>" +
+      "<text x='" + (n.x + 12) + "' y='" + (n.y + 37) + "' font-size='10' fill='#475569'>" + n.sub + "</text>" +
+      "</g>";
+  }).join("");
+
+  svg.innerHTML = paths + boxes;
+}
+
+loadITS();
 </script>
 </body>
 </html>
